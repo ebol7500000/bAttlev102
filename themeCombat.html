@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>bAttle text-based game</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="icon" type="image/png" href="./theme_ico.png">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet" />
+
+<style>
+  .buttonnn{
+    border: 2px solid #d4a761;
+    background-color: #d4a761 ;
+  }
+#hpBar, #mpBar, #xpBar {
+  height: 16px;
+  background: #444;
+  border-radius: 8px;
+  overflow: hidden;
+  width: 150px;
+}
+:root {
+  --bg: #1a170f; --card: #1f1c14; --muted: #8a8a7c; --text: #f0e9d9; --accent: #d4a761; --accent2: #bfa33f; --danger: #bf6d3f; --ok: #a3bf3f;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; font-family: Roboto, system-ui, -apple-system, Segoe UI, Arial; color: var(--text); background: radial-gradient(1200px 800px at 20% 10%, #252219, var(--bg)); }
+#lutaSistema { display: flex; align-items: center; gap: 10px; padding: 10px; background: #2a2a25; border-radius: 12px; margin-bottom: 16px; }
+#lutaSistema button { padding: 8px 12px; border: none; border-radius: 8px; cursor: pointer; background: #d4a761; font-weight: 700; }
+#lutaSistema button:hover { filter: brightness(1.1); }
+.grid { display: grid; grid-template-columns: 320px 1fr; gap: 16px; }
+@media(max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+.panel { background: var(--card); border-radius: 18px; box-shadow: 0 10px 30px rgba(0,0,0,0.35); overflow: hidden; }
+.panel h2, .panel h3 { margin: 0 0 8px; }
+.pad { padding: 16px 18px; }
+.title { display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: 700; }
+.section { border-top: 1px solid #323025; margin-top: 12px; padding-top: 12px; }
+.list { display: grid; gap: 10px; }
+.stat { display: flex; justify-content: space-between; margin-top: 4px; }
+.bar #hpBar span { background-color: green; }
+.bar #xpBar span { background-color: blue; }
+.bar #xpBar span { background-color: white; }
+.bar { width: 150px; height: 16px; border-radius: 8px; overflow: hidden; margin-top: 4px; border: white }
+#statusPanel .equip-slot { display: grid; grid-template-columns: 110px 1fr; gap: 8px; align-items: center; margin-bottom: 4px; }
+#statusPanel span.equip { font-weight: bold; }
+#enemyInfo { display: flex; align-items: center; gap: 12px; background: #2a2a25; padding: 10px; border-radius: 8px; margin-top: 8px; }
+#enemyIcon { font-size: 30px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- Sistema de luta na linha superior -->
+<div id="lutaSistema">
+  <button onclick="encontrarInimigo()">Encontrar Inimigo</button>
+  <div id="enemyDisplay" style="display:flex; align-items:center; gap:10px;">
+    <div id="enemyIcon">?</div>
+    <div>
+      <div id="enemyNome">Nenhum inimigo</div>
+      <div>HP: <span id="enemyHP">0/0</span> / <span id="enemyMaxHP">0</span></div>
+    </div>
+    <button id="btnAtacar" disabled onclick="atacar()">Atacar</button>
+  </div>
+</div>
+
+<div class="grid">
+  <!-- Esquerda: Status + Equipamentos -->
+  <aside class="panel" id="statusPanel">
+    <div class="pad">
+      <div class="title">⚔️ bAttle <span class="pill" id="rankTag">Nv 1</span></div>
+      
+      <!-- BARRAS -->
+      <div class="stat"><span>HP</span><span id="hpLabel">100/100</span></div>
+      <div class="bar"><span id="hpBar"></span></div>
+      
+      <div class="stat"><span>MP</span><span id="mpLabel">30/30</span></div>
+      <div class="bar"><span id="mpBar"></span></div>
+      
+      <div class="stat"><span>XP</span><span id="xpLabel">0 / 50</span></div>
+      <div class="bar"><span id="xpBar"></span></div>
+      
+      <div class="row" style="margin-top:10px">
+        <span class="pill">ATQ <b id="atkVal">10</b></span>
+        <span class="pill">DEF <b id="defVal">5</b></span>
+        <span class="pill">CRIT <b id="critVal">3%</b></span>
+        <span class="pill">OURO <b id="goldVal">0</b></span>
+      </div>
+      
+      <div class="section">
+        <h3>🎒 Inventário</h3>
+        <div id="inventory" class="list"></div>
+      </div>
+      
+      <div class="section">
+        <h3>🧰 Equipamento</h3>
+        <div class="equip-slot"><span class="muted">Arma</span><span id="eq-weapon">Nenhuma</span> <button class="buttonnn" style="background: #d4a761" onclick="equipItem('arma')">Equip</button></div>
+        <div class="equip-slot"><span class="muted">Off-hand</span><span id="eq-offhand">Nenhum</span> <button class="buttonnn" style="background: #d4a761" onclick="equipItem('off')">Equip</button></div>
+        <div class="equip-slot"><span class="muted">Amuleto</span><span id="eq-amulet">Nenhum</span> <button class="buttonnn" style="background: #d4a761" onclick="equipItem('amu')">Equip</button></div>
+      </div>
+    </div>
+  </aside>
+  
+  <!-- Direita: Loja + Lista de itens -->
+  <main class="panel" id="shopPanel">
+    <div class="pad">
+      <h2>Loja</h2>
+      <div id="filterButtons">
+        <button class="buttonnn" style="background: #d4a761" onclick="ordenarItens('asc')">Ordenar por Menor Preço</button>
+        <button class="buttonnn" style="background: #d4a761;" onclick="ordenarItens('desc')">Ordenar por Maior Preço</button>
+      </div>
+      <div id="itensContainer"></div>
+      
+      <h3>Comprar item</h3>
+      <p>Selecione um item para comprar e adicionar ao inventário.</p>
+    </div>
+  </main>
+</div>
+
+<!-- Lista de TODOS os itens no final -->
+<div class="section" style="margin-top:20px;">
+  <h2>Lista Completa de 1000 Itens</h2>
+  <div id="todosItens"></div>
+</div>
+
+<div class="foot"> grind fácil até 10 · médio até 60 · XP reduzida no 100 · itens até 2.000.000 ouro</div>
+
+<script>
+// ========================
+// Geração de itens
+function gerarItens() {
+  const itens = [];
+  const nomes = ['Espada', 'Adaga', 'Lança', 'Escudo', 'Poção', 'Amuleto', 'Armadura', 'Elmo', 'Broquel', 'Cajado', 'Chicote', 'Disco', 'Cetro', 'Garras', 'Foice', 'Martelo'];
+  const elems = ['Fogo', 'Água', 'Terra', 'Vento', 'Luz', 'Trevas', 'Veneno', 'Impacto', 'Raio', 'Neutro', 'Sagrado'];
+  for(let i=1; i<=1000; i++){
+    const preco = Math.floor(Math.random()*2000000)+1; 
+    const tipoRand = Math.random();
+    let tipo = '';
+    if(tipoRand<0.3){ tipo='arma'; }
+    else if(tipoRand<0.5){ tipo='off'; }
+    else if(tipoRand<0.65){ tipo='amu'; }
+    else if(tipoRand<0.85){ tipo='consum'; }
+    else { tipo='equip'; }
+    const nomeBase = nomes[Math.floor(Math.random()*nomes.length)];
+    const elem = elems[Math.floor(Math.random()*elems.length)];
+    let item = { id:'auto'+i, nome:`${nomeBase} #${i}`, preco:preco, tipo:tipo };
+    if(tipo==='arma'){
+      item.min = Math.floor(Math.random()*10)+3;
+      item.max = item.min + Math.floor(Math.random()*10)+1;
+      item.crit = Math.floor(Math.random()*10)+1;
+      item.vel = (Math.random()*0.5+0.5).toFixed(2);
+      item.elem = elem;
+    } else if(tipo==='off'){
+      item.def = Math.floor(Math.random()*10)+2;
+      item.bloco = Math.floor(Math.random()*20)+10;
+    } else if(tipo==='amu'){
+      if(Math.random()<0.5) item.bonusHP = Math.floor(Math.random()*50)+10;
+      if(Math.random()<0.5) item.bonusCRIT = Math.floor(Math.random()*5)+1;
+      if(Math.random()<0.5) item.bonusMP = Math.floor(Math.random()*30)+5;
+      if(Math.random()<0.5) item.bonusATK = Math.floor(Math.random()*10)+1;
+    } else if(tipo==='consum'){
+      item.heal = Math.floor(Math.random()*50)+10;
+      if(Math.random()<0.3) item.mana = Math.floor(Math.random()*50)+10;
+    } else if(tipo==='equip'){
+      if(nomeBase==='Espada'){
+        item.min = Math.floor(Math.random()*10)+5;
+        item.max = item.min + Math.floor(Math.random()*10)+5;
+        item.elem = elems[Math.floor(Math.random()*elems.length)];
+      } else if(nomeBase==='Escudo'){
+        item.def = Math.floor(Math.random()*10)+3;
+        item.bloco = Math.floor(Math.random()*15)+5;
+      } else if(nomeBase==='Armadura'){
+        item.def = Math.floor(Math.random()*15)+5;
+      } else if(nomeBase==='Elmo'){
+        item.def = Math.floor(Math.random()*5)+2;
+      }
+    }
+    itens.push(item);
+  }
+  return itens;
+}
+const ITEMS = gerarItens();
+
+// Variável para itens ordenados na loja
+let itensOrdenados = [...ITEMS];
+
+// ========================
+// Herói
+let heroi = {
+  nome:'Herói',
+  lv:1,
+  hp:100,
+  maxHp:100,
+  mp:30,
+  maxMp:30,
+  xp:0,
+  gold:0,
+  atk:10,
+  def:5,
+  crit:3,
+  elem:'Neutro',
+  inventory:[],
+  equipWeapon:null,
+  equipOffhand:null,
+  equipAmulet:null
+};
+
+// Inimigo atual
+let inimigoAtual = null;
+
+// Lista de inimigos
+const ENEMIES = [
+  { nome:'Esqueleto', hp:50, atk:8, def:2, icon:'💀', gold:[10,20], drops:[['Poção',0.3], ['Espada #1',0.1], ['Escudo #1',0.1]] },
+  { nome:'Múmia', hp:80, atk:12, def:4, icon:'🤕', gold:[20,50], drops:[['Poção',0.4], ['Amuleto #1',0.05], ['Lança #1',0.05]] },
+  { nome:'Faraó Fantasma', hp:120, atk:20, def:6, icon:'👻', gold:[50,100], drops:[['Poção',0.5], ['Cetro #1',0.05], ['Broquel #1',0.05]] }
+];
+
+const nomesExtras = ['Lobisomem', 'Gárgula', 'Dragão Pequeno', 'Goblin', 'Orc', 'Troll', 'Basilisco', 'Vampiro', 'Serpente Gigante', 'Manticora', 'Hidra', 'Súcubo', 'Quimera', 'Lamia', 'Harpia', 'Fênix', 'Minotauro', 'Espectro', 'Demonio', 'Verdadeiro Demônio', 'Lobo Sombrio', 'Esquilo Assassino', 'Rato Gigante', 'Aranha Mortal', 'Cobra Gigante', 'Leão Selvagem', 'Urso Selvagem', 'Lobo Polido', 'Saci', 'Bicho-Papão', 'Cuca', 'Sereia', 'Sirene', 'Naga'];
+for(let i=0; i<396; i++){
+  const nomeAleatorio = nomesExtras[Math.floor(Math.random()*nomesExtras.length)];
+  const hpBase=40+Math.floor(Math.random()*30);
+  const atkBase=6+Math.floor(Math.random()*6);
+  const defBase=2+Math.floor(Math.random()*3);
+  const goldMin=5+Math.floor(Math.random()*10);
+  const goldMax=goldMin+Math.floor(Math.random()*10);
+  ENEMIES.push({ nome:nomeAleatorio, hp:hpBase, atk:atkBase, def:defBase, icon:'👹', gold:[goldMin,goldMax], drops:[['Poção',0.2+Math.random()*0.3], ['Item raro',0.05]] });
+}
+
+// ========================
+// Funções para salvar e carregar
+function salvarNoLocalStorage() {
+  localStorage.setItem('gameState', JSON.stringify(heroi));
+}
+function carregarDoLocalStorage() {
+  const data = localStorage.getItem('gameState');
+  if (data) {
+    const p = JSON.parse(data);
+    Object.assign(heroi, p);
+  }
+}
+
+// ========================
+// Mostrar itens na loja
+function mostrarItens() {
+  const container = document.getElementById('itensContainer');
+  container.innerHTML = '';
+  for(let item of itensOrdenados){
+    container.innerHTML += `<div class="item-entry" style="display:flex; justify-content:space-between; align-items:center; padding:4px; border-bottom:1px solid #555;">
+      <div class="item-info"><b>${item.nome}</b> (${item.tipo}) - PO ${item.preco.toLocaleString()}</div>
+      <button class="buttonnn" onclick="comprarItem('${item.id}')">Comprar</button>
+    </div>`;
+  }
+}
+
+// Ordenar itens
+function ordenarItens(ordem) {
+  if(ordem==='asc'){
+    itensOrdenados = [...ITEMS].sort((a,b)=>a.preco-b.preco);
+  } else {
+    itensOrdenados = [...ITEMS].sort((a,b)=>b.preco-a);
+  }
+  mostrarItens();
+}
+
+// Comprar item
+function comprarItem(id) {
+  const item = ITEMS.find(i=>i.id===id);
+  if(!item) return;
+  // Adiciona ao inventário
+  let invItem = heroi.inventory.find(i=>i.id===item.id);
+  if(invItem){
+    invItem.quantidade=(invItem.quantidade||1)+1;
+  } else {
+    heroi.inventory.push({ ...item, quantidade:1 });
+  }
+  alert(`Você comprou: ${item.nome}`);
+  atualizarInventario();
+}
+
+// Atualizar inventário
+function atualizarInventario() {
+  const div = document.getElementById('inventory');
+  div.innerHTML='';
+  heroi.inventory.forEach(i => {
+    div.innerHTML += `<div>${i.nome} x${i.quantidade}</div>`;
+  });
+}
+
+// Equipar itens
+function equipItem(tipo) {
+  let item=null;
+  if(tipo==='arma') item=heroi.equipWeapon;
+  if(tipo==='off') item=heroi.equipOffhand;
+  if(tipo==='amu') item=heroi.equipAmulet;
+  if(!item){ alert('Nenhum item equipado nesse slot!'); return; }
+  if(tipo==='arma'){ heroi.equipWeapon=item; document.getElementById('eq-weapon').textContent= item.nome; }
+  if(tipo==='off'){ heroi.equipOffhand=item; document.getElementById('eq-offhand').textContent= item.nome; }
+  if(tipo==='amu'){ heroi.equipAmulet=item; document.getElementById('eq-amulet').textContent= item.nome; }
+  salvarNoLocalStorage(); // salva após equipar
+}
+
+// ========================
+// Sistema de luta
+// ========================
+
+function encontrarInimigo() {
+  const inim = ENEMIES[Math.floor(Math.random()*ENEMIES.length)];
+  inimigoAtual = {...inim}; // copia
+  inimigoAtual.hpMax = inim.hp; // salva o valor máximo
+  document.getElementById('enemyIcon').textContent = inim.icon;
+  document.getElementById('enemyNome').textContent = inim.nome;
+  document.getElementById('enemyHP').textContent = `${inim.hp}/${inim.hp}`;
+  document.getElementById('enemyMaxHP').textContent = inim.hp; // valor fixo
+  document.getElementById('btnAtacar').disabled=false;
+}
+
+function atacar() {
+  if(!inimigoAtual) return;
+  // Dano do herói
+  let danoHerói = Math.max(1, Math.floor(heroi.atk * (1 + Math.random()*0.5))) - (inimigoAtual.def || 0);
+  if(danoHerói<1) danoHerói=1;
+  inimigoAtual.hp -= danoHerói;
+  if(inimigoAtual.hp<0) inimigoAtual.hp=0;
+  // Atualiza o HP do inimigo
+  document.getElementById('enemyHP').textContent = `${inimigoAtual.hp}/${inimigoAtual.hpMax}`;
+
+  alert(`Você causou ${danoHerói} de dano!`);
+
+  if(inimigoAtual.hp<=0){
+    alert(`Inimigo ${inimigoAtual.nome} derrotado!`);
+    const ouroGanhos = Math.floor(Math.random()*(inimigoAtual.gold[1]-inimigoAtual.gold[0]+1))+inimigoAtual.gold[0];
+    heroi.gold+=ouroGanhos;
+    const xpGanhos = 10+Math.floor(Math.random()*10);
+    heroi.xp+=xpGanhos;
+    alert(`Ganhou ${ouroGanhos} ouro e ${xpGanhos} XP!`);
+
+    // Subir de nível
+    const xpNecessaria=heroi.lv*50;
+    if(heroi.xp>=xpNecessaria) {
+      heroi.lv++;
+      heroi.xp-=xpNecessaria;
+      heroi.maxHp+=10;
+      heroi.hp=heroi.maxHp;
+      heroi.maxMp+=5;
+      heroi.mp=heroi.maxMp;
+      alert(`Parabéns! Você subiu para o nível ${heroi.lv}!`);
+    }
+    atualizarInventario();
+    atualizarStatus();
+    salvarNoLocalStorage(); // salva após ganhar xp e subir de nível
+
+    // reset inimigo
+    inimigoAtual=null;
+    document.getElementById('enemyIcon').textContent='?';
+    document.getElementById('enemyNome').textContent='Nenhum inimigo';
+    document.getElementById('enemyHP').textContent='0/0';
+    document.getElementById('enemyMaxHP').textContent='0';
+    document.getElementById('btnAtacar').disabled=true;
+    return;
+  }
+
+  // Inimigo ataca
+  const danoInimigo = Math.max(0, inimigoAtual.atk - heroi.def);
+  heroi.hp -= danoInimigo;
+  if(heroi.hp<0) heroi.hp=0;
+  alert(`${inimigoAtual.nome} causou ${danoInimigo} de dano em você!`);
+  if(heroi.hp<=0){
+    alert('Você morreu! O personagem foi resetado.');
+    resetHerói();
+  }
+  atualizarStatus();
+  salvarNoLocalStorage(); // salva após ataque
+}
+
+function resetHerói() {
+  heroi.hp=heroi.maxHp;
+  heroi.mp=heroi.maxMp;
+  heroi.xp=0;
+  heroi.gold=0;
+  salvarNoLocalStorage(); // salva o reset
+}
+
+// ========================
+// Inicializa a loja ao carregar
+// ========================
+mostrarItens();
+
+// ========================
+// Atualiza a UI
+// ========================
+function atualizarStatus() {
+  document.getElementById('hpLabel').textContent = `${heroi.hp}/${heroi.maxHp}`;
+  document.getElementById('hpBar').style.width = (heroi.hp / heroi.maxHp * 100) + '%';
+
+  document.getElementById('mpLabel').textContent = `${heroi.mp}/${heroi.maxMp}`;
+  document.getElementById('mpBar').style.width = (heroi.mp / heroi.maxMp * 100) + '%';
+
+  const xpNecessaria=heroi.lv*50;
+  document.getElementById('xpLabel').textContent = `${heroi.xp} / ${xpNecessaria}`;
+  document.getElementById('xpBar').style.width = (heroi.xp / xpNecessaria * 100) + '%';
+
+  document.getElementById('rankTag').textContent = `Nv ${heroi.lv}`;
+  document.getElementById('goldVal').textContent = heroi.gold;
+  document.getElementById('atkVal').textContent=heroi.atk;
+  document.getElementById('defVal').textContent=heroi.def;
+  document.getElementById('critVal').textContent=heroi.crit+'%';
+
+  // Atualiza equipamentos na UI
+  document.getElementById('eq-weapon').textContent=heroi.equipWeapon?heroi.equipWeapon.nome:'Nenhuma';
+  document.getElementById('eq-offhand').textContent=heroi.equipOffhand?heroi.equipOffhand.nome:'Nenhum';
+  document.getElementById('eq-amulet').textContent=heroi.equipAmulet?heroi.equipAmulet.nome:'Nenhum';
+
+  // Atualiza inventário
+  atualizarInventario();
+
+  // Salva toda vez que atualiza
+  salvarNoLocalStorage();
+}
+
+// ========================
+// Carregar o estado salvo ao iniciar
+// ========================
+carregarDoLocalStorage();
+atualizarStatus();
+
+</script>
+</body>
+</html>

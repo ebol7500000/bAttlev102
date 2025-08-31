@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="unnamed.png">
+    <link rel="icon" type="image/png" href="./theme_ico.png">
+    <title>Carregando...</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #000;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            box-sizing: border-box;
+        }
+        .container {
+            text-align: center;
+            width: 20%;
+            margin: 0 auto;
+        }
+        .logo-container {
+            margin-bottom: 20px;
+        }
+        .logo {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+        .loading-text {
+            margin-bottom: 10px;
+            font-size: 1.2em;
+            color: #d4a761;
+        }
+        .progress-bar-container {
+            width: 100%;
+            background-color: #555;
+            border-radius: 5px;
+            overflow: hidden;
+            height: 20px;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0;
+            background-color: #d4a761;
+        }
+        .progress-bar.animate {
+            width: 100%;
+            transition: width 2.5s linear; /* Tempo de transição alterado para 2.5 segundos */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="logo-container">
+            <img src="themebAttle.png" alt="Logo do jogo Emberfall" class="logo">
+        </div>
+        
+        <h4 class="loading-text">Carregando...</h4>
+        
+        <div class="progress-bar-container">
+            <div id="progressBar" class="progress-bar"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const progressBar = document.getElementById("progressBar");
+            
+            setTimeout(function() {
+                progressBar.classList.add("animate");
+            }, 100);
+            
+            setTimeout(function() {
+                window.location.href = "themeCombat.html";
+            }, 2500); /* Tempo de redirecionamento alterado para 2.5 segundos (2500ms) */
+        });
+    </script>
+
+</body>
+</html>
