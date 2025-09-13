@@ -1,64 +1,81 @@
-# bAttlev101
-complement_of_todoify
-Lore: Em meio às terras esquecidas de Eldoria, o nome de Kael ressoa como um sussurro de esperança. Não é um cavaleiro de linhagem nobre, nem um mago de grande poder, mas um aventureiro solitário, forjado pela necessidade. Sua jornada começou após a Sombreira, uma praga que transformou as masmorras outrora pacíficas em covis de monstros. Com sua espada e a astúcia adquirida em anos de exploração, Kael desce às profundezas, buscando não a glória, mas a redenção. Ele luta contra goblins, espectros e abominações para purificar a terra, motivado pela memória de seu vilarejo, consumido pela escuridão. Cada inimigo derrotado é um passo em direção à luz, um eco de que mesmo a menor das chamas pode dissipar a maior das sombras.
- Para converter a documentação em um conteúdo Markdown puro e simples, você pode seguir a estrutura abaixo. Este formato remove as formatações específicas da resposta anterior, mantendo apenas a sintaxe básica do Markdown para títulos, listas e texto simples.
+# bAttle - Jogo de RPG Textual
+
+Um simples jogo de RPG por turnos, totalmente em uma única página HTML, onde você derrota monstros, coleta ouro, equipa itens e fica mais forte.
 
 ---
 
-### **Documentação para o Jogo bAttle text-based game**
+### **Sumário**
+1.  [Visão Geral](#visão-geral)
+2.  [Como Jogar](#como-jogar)
+3.  [Mecânicas do Jogo](#mecânicas-do-jogo)
+4.  [Itens e Equipamentos](#itens-e-equipamentos)
+5.  [Créditos e Desenvolvimento](#créditos-e-desenvolvimento)
+6.  [Código Completo](#código-completo)
 
-Essa documentação descreve um jogo de RPG de texto para navegador, focado em combate, gerenciamento de status e inventário. O código utiliza HTML, CSS e JavaScript para criar uma interface simples e interativa, onde os jogadores podem lutar contra inimigos, comprar e equipar itens. A persistência dos dados é feita através do **Local Storage** do navegador, o que significa que o progresso do jogador é salvo automaticamente.
+---
 
-O jogo é dividido em três áreas principais:
-* **Sistema de Luta:** Localizado no topo, permite encontrar e atacar inimigos.
-* **Painel de Status e Inventário:** Na lateral esquerda, mostra informações do seu personagem (vida, mana, experiência), atributos (ataque, defesa, crítico) e a lista de itens.
-* **Painel da Loja:** Na lateral direita, exibe todos os itens disponíveis para compra, que podem ser filtrados por preço.
+### **Visão Geral**
 
-### **Estrutura do Código**
+`bAttle` é um jogo de RPG minimalista, construído com HTML, CSS e JavaScript. Ele opera inteiramente no seu navegador, sem a necessidade de um servidor. O jogo se concentra em combates simples e progressão do personagem através de um sistema de itens e níveis.
 
-#### **HTML**
-O HTML organiza a estrutura visual do jogo. A interface é dividida em painéis (usando a classe `panel`) e um sistema de grade (`grid`) para posicionar os elementos.
+### **Como Jogar**
 
-* `div#lutaSistema`: Contém os botões para interagir com o combate e exibir informações do inimigo atual.
-* `div#statusPanel`: Exibe o status do herói, incluindo barras de HP, MP e XP, valores de atributos, inventário e slots de equipamento.
-* `div#shopPanel`: Contém a interface da loja, com botões de ordenação e a lista de itens.
-* `div#todosItens`: Uma seção separada que lista todos os 1000 itens gerados no jogo.
+1.  **Encontrar Inimigo:** Clique no botão para iniciar um combate contra um monstro aleatório.
+2.  **Atacar:** Clique no botão "Atacar" para causar dano ao inimigo. O combate é por turnos: você ataca, e depois o inimigo ataca.
+3.  **Ganhar Recompensas:** Ao derrotar um inimigo, você ganha **Ouro** e **XP**.
+4.  **Loja:** Use seu ouro para comprar itens poderosos na Loja e melhorar seus status.
+5.  **Limpar Dados:** Se precisar começar do zero, use o botão "Limpar Dados" para apagar seu progresso salvo.
 
-#### **CSS**
-O estilo (`<style>`) é incorporado diretamente no HTML para uma apresentação compacta. Ele usa **variáveis CSS** (`:root`) para definir um tema de cores rústico. O layout é responsivo, adaptando-se a telas menores com uma única coluna (`@media(max-width: 900px)`).
+---
 
-#### **JavaScript**
-O script é o coração da aplicação, gerenciando toda a lógica do jogo.
+### **Mecânicas do Jogo**
 
-* **Geração de Itens e Inimigos**
-    * `gerarItens()`: Cria uma lista de **1000 itens** aleatórios com diferentes tipos (`arma`, `off`, `amu`, `consum`, `equip`) e atributos.
-    * `const ITEMS`: Armazena a lista de todos os itens gerados.
-    * `const ENEMIES`: Um array que define os inimigos fixos e, em seguida, gera **396 inimigos adicionais** de forma aleatória.
+#### **Combate**
+O dano é calculado de forma simples:
+* **Dano do Jogador:** `ATK do Herói` - `DEF do Inimigo`
+* **Dano do Inimigo:** `ATK do Inimigo` - `DEF do Herói`
+Ambos os ataques podem causar dano crítico com base no status **CRIT** do atacante.
 
-* **Gerenciamento de Estado**
-    * `let heroi`: Um objeto que armazena todas as informações do personagem principal, como nível, pontos de vida, ouro, atributos e inventário.
-    * `let inimigoAtual`: Armazena o objeto do inimigo que o jogador está enfrentando.
+#### **Nivelamento (Level Up)**
+Você ganha **XP** ao derrotar inimigos. A quantidade de XP necessária para subir de nível é:
+* `XP Necessária = Nível do Herói * 50`
 
-* **Funções Principais**
-    * `salvarNoLocalStorage()`: Salva o estado atual do objeto `heroi` no `localStorage` do navegador para manter o progresso.
-    * `carregarDoLocalStorage()`: Recupera o estado do jogo salvo no `localStorage` ao carregar a página.
-    * `mostrarItens()` e `ordenarItens()`: Controlam a exibição dos itens na loja, permitindo ordená-los por preço.
-    * `comprarItem()` e `atualizarInventario()`: Gerenciam a lógica de compra de itens e atualizam a visualização do inventário do jogador.
-    * `encontrarInimigo()`: Seleciona um inimigo aleatório da lista e o prepara para a batalha.
-    * `atacar()`: Lida com a lógica de combate, calculando o dano do herói e do inimigo. A função também verifica se o inimigo foi derrotado, concedendo ouro e XP.
-    * `atualizarStatus()`: Uma função central que atualiza todos os elementos visuais da interface (barras, etiquetas, etc.) com os valores atuais do objeto `heroi`.
+Ao subir de nível, seus status base aumentam:
+* `+10` para **HP Máximo**
+* `+5` para **MP Máximo**
 
-### **Fluxo do Jogo**
+#### **Ouro e Loja**
+O ouro é ganho ao derrotar inimigos. A loja oferece 1000 itens gerados aleatoriamente, com um sistema de raridade baseado em preço e poder.
 
-1.  **Início:** Ao carregar a página, o jogo tenta carregar o progresso salvo do `localStorage`. Se não houver dados, ele inicia com as configurações padrão do objeto `heroi`.
-2.  **Exploração:** O jogador clica no botão "Encontrar Inimigo" para iniciar um combate.
-3.  **Combate:** O botão "Atacar" se torna ativo. Cada clique simula um turno de ataque. O herói ataca o inimigo, e em seguida, o inimigo revida. A vida de ambos é exibida e atualizada.
-4.  **Vitória:** Se o inimigo for derrotado, o jogador recebe ouro e XP. A experiência é acumulada até que a quantidade necessária para o próximo nível seja atingida. Ao subir de nível, o herói ganha mais HP e MP.
-5.  **Derrota:** Se o HP do herói chegar a zero, o jogo exibe uma mensagem de morte e o progresso é **resetado**.
-6.  **Progressão:** O ouro obtido em combate pode ser usado na loja para comprar itens. O jogador pode equipar esses itens para aumentar seus atributos.
+---
 
-### **Pontos-Chave**
+### **Itens e Equipamentos**
 
-* **Persistência de Dados:** O jogo salva automaticamente o progresso do jogador no `localStorage` após cada ação relevante (comprar, lutar, equipar).
-* **Economia e Progressão:** A progressão é baseada em um ciclo de `Lutar -> Ganhar Ouro e XP -> Comprar Itens -> Ficar mais forte -> Lutar com mais eficiência`.
-* **Geração Procedural:** Grande parte do conteúdo do jogo (itens e inimigos) é gerada aleatoriamente, garantindo uma certa variedade.
+O jogo possui um sistema de raridade **3:2:1**, que define os preços e o poder dos itens na loja.
+
+* **Comuns (50%):** Preço de **1 a 100** de ouro. Adicionam um pequeno aumento nos status.
+* **Raros (33%):** Preço de **101 a 5.000** de ouro. Oferecem um aumento moderado.
+* **Épicos (17%):** Preço de **5.001 a 5.000.000** de ouro. Itens mais caros e poderosos do jogo.
+
+#### **Tipos de Equipamento**
+* **Arma:** Aumenta seu **ATQ** (Ataque) e **CRIT** (Chance de Crítico).
+* **Off-hand:** Aumenta sua **DEF** (Defesa).
+* **Amuleto:** Pode aumentar seu **HP**, **MP**, **ATK** e/ou **CRIT**.
+* **Poção de Cura:** Item consumível que restaura todo o seu HP.
+
+Os bônus de todos os itens equipados são somados aos seus status base para determinar seu poder total.
+
+---
+
+### **Créditos e Desenvolvimento**
+
+Este projeto foi desenvolvido em colaboração, com o objetivo de criar um jogo simples e divertido em um único arquivo de código.
+
+* **Designer:** O jogo foi projetado com base em contribuições diretas, incluindo o sistema de preços dos itens, a distribuição de raridade e os conceitos de jogo.
+* **Desenvolvimento:** O código é escrito em **HTML**, **CSS** e **JavaScript** puro.
+
+---
+
+### **Código Completo**
+
+Para rodar o jogo, basta copiar e colar o código abaixo em um arquivo `index.html`
