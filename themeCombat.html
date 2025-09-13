@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet" />
 
 <style>
+/* --- Início do Código CSS Original (Desktop) --- */
 .buttonnn {
 border: 2px solid #d4a761;
 background-color: #d4a761 ;
@@ -46,6 +47,129 @@ html, body { height: 100%; margin: 0; font-family: Roboto, system-ui, -apple-sys
 #enemyInfo { display: flex; align-items: center; gap: 12px; background: #2a2a25; padding: 10px; border-radius: 8px; margin-top: 8px; }
 #enemyIcon { font-size: 30px; }
 #notification { position: fixed; top: 20px; right: 20px; background-color: #d4a761; color: var(--bg); padding: 10px 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); transition: opacity 0.5s ease-in-out; opacity: 0; z-index: 1000; }
+/* --- Fim do Código CSS Original --- */
+
+/* --- Início do Código Responsivo (Tema Egípcio) --- */
+@media (max-width: 900px) {
+:root {
+  --bg: #2b261b; /* Fundo mais escuro */
+  --card: #3f3929; /* Card de papiro */
+  --muted: #c9c3ac; /* Texto sutil */
+  --text: #fef8dd; /* Cor de areia */
+  --accent: #e2b714; /* Dourado */
+  --accent2: #b47f0e; /* Ouro antigo */
+  --danger: #9c3c1e; /* Vermelho ferrugem */
+  --ok: #3a8a3f; /* Verde antigo */
+}
+
+body {
+  background: #2b261b;
+  font-family: 'Times New Roman', serif;
+  font-weight: 400;
+}
+
+/* Layout principal para mobile */
+.grid {
+  grid-template-columns: 1fr;
+}
+
+.panel {
+  border-radius: 0;
+  box-shadow: none;
+  border: 2px solid var(--accent);
+  border-left: none;
+  border-right: none;
+  background: var(--card);
+}
+
+.panel:first-of-type {
+  border-top: none;
+}
+
+.pad {
+  padding: 10px;
+}
+
+/* Estilo do título e pilhas */
+.title {
+  font-family: 'Papyrus', 'Georgia', serif;
+  font-size: 24px;
+  justify-content: center;
+  margin-bottom: 15px;
+  color: var(--accent);
+}
+
+.pill {
+  background: var(--accent);
+  color: var(--bg);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+/* Ajustes nas barras de status */
+#hpBar, #mpBar, #xpBar {
+  width: 100%;
+}
+
+#lutaSistema {
+  flex-direction: column;
+  align-items: stretch;
+  padding: 10px;
+  background: var(--card);
+  border-radius: 0;
+  border: 2px solid var(--accent);
+  border-bottom: none;
+  border-left: none;
+  border-right: none;
+}
+
+#lutaSistema button {
+  background: var(--accent);
+  color: var(--bg);
+  font-weight: 700;
+  width: 100%;
+  margin-top: 8px;
+}
+
+#enemyDisplay {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* Itens da loja e inventário */
+.item-entry {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+}
+
+.buttonnn {
+  width: 100%;
+  margin-top: 5px;
+}
+
+#inventory .buttonnn {
+  width: auto;
+  margin-top: 0;
+  font-size: 14px;
+  padding: 4px 8px;
+}
+
+#notification {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+  text-align: center;
+  background: var(--accent);
+  color: var(--bg);
+  border: 2px solid var(--accent2);
+}
+}
+/* --- Fim do Código Responsivo --- */
 </style>
 </head>
 <body>
@@ -102,11 +226,17 @@ html, body { height: 100%; margin: 0; font-family: Roboto, system-ui, -apple-sys
 <main class="panel" id="shopPanel">
 <div class="pad">
 <h2>Loja</h2>
-<div id="filterButtons">
+<div id="filterButtons" style="margin-bottom: 10px;">
 <button class="buttonnn" style="background: #d4a761" onclick="ordenarItens('asc')">Ordenar por Menor Preço</button>
 <button class="buttonnn" style="background: #d4a761;" onclick="ordenarItens('desc')">Ordenar por Maior Preço</button>
 </div>
 <div id="itensContainer"></div>
+
+<div id="paginationControls" style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+<button class="buttonnn" onclick="mudarPagina(-1)" disabled id="prevPageBtn">Anterior</button>
+<span id="pageInfo">Página 1 de 100</span>
+<button class="buttonnn" onclick="mudarPagina(1)" id="nextPageBtn">Próxima</button>
+</div>
 
 <h3>Comprar item</h3>
 <p>Selecione um item para comprar e adicionar ao inventário.</p>
@@ -198,6 +328,8 @@ const ITEMS = gerarItens();
 
 // Variável para itens ordenados na loja
 let itensOrdenados = [...ITEMS];
+let paginaAtual = 1;
+const ITENS_POR_PAGINA = 10;
 
 // ========================
 // Herói
@@ -272,24 +404,46 @@ location.reload();
 }
 
 // ========================
-// Mostrar itens na loja
+// Mostrar itens na loja com paginação
 function mostrarItens() {
 const container = document.getElementById('itensContainer');
 container.innerHTML = '';
-for(let item of itensOrdenados){
+
+const inicio = (paginaAtual - 1) * ITENS_POR_PAGINA;
+const fim = inicio + ITENS_POR_PAGINA;
+const itensNaPagina = itensOrdenados.slice(inicio, fim);
+
+for(let item of itensNaPagina){
 container.innerHTML += `<div class="item-entry" style="display:flex; justify-content:space-between; align-items:center; padding:4px; border-bottom:1px solid #555;">
 <div class="item-info"><b>${item.nome}</b> (${item.tipo}) - PO ${item.preco.toLocaleString()}</div>
 <button class="buttonnn" onclick="comprarItem('${item.id}')">Comprar</button>
 </div>`;
 }
+
+// Atualiza os controles de paginação
+document.getElementById('pageInfo').textContent = `Página ${paginaAtual} de ${Math.ceil(ITEMS.length / ITENS_POR_PAGINA)}`;
+document.getElementById('prevPageBtn').disabled = paginaAtual === 1;
+document.getElementById('nextPageBtn').disabled = paginaAtual === Math.ceil(ITEMS.length / ITENS_POR_PAGINA);
 }
 
-// Ordenar itens
+// Ordenar itens e resetar a página para a primeira
 function ordenarItens(ordem) {
 if(ordem==='asc'){
 itensOrdenados = [...ITEMS].sort((a,b)=>a.preco-b.preco);
 } else {
 itensOrdenados = [...ITEMS].sort((a,b)=>b.preco-a.preco);
+}
+paginaAtual = 1; // Reseta para a primeira página ao ordenar
+mostrarItens();
+}
+
+// Função para mudar a página
+function mudarPagina(direcao) {
+const totalPaginas = Math.ceil(ITEMS.length / ITENS_POR_PAGINA);
+if (direcao === 1 && paginaAtual < totalPaginas) {
+paginaAtual++;
+} else if (direcao === -1 && paginaAtual > 1) {
+paginaAtual--;
 }
 mostrarItens();
 }
