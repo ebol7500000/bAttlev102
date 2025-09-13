@@ -9,19 +9,19 @@
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet" />
 
 <style>
-  .buttonnn{
-    border: 2px solid #d4a761;
-    background-color: #d4a761 ;
-  }
+.buttonnn {
+border: 2px solid #d4a761;
+background-color: #d4a761 ;
+}
 #hpBar, #mpBar, #xpBar {
-  height: 16px;
-  background: #444;
-  border-radius: 8px;
-  overflow: hidden;
-  width: 150px;
+height: 16px;
+background: #444;
+border-radius: 8px;
+overflow: hidden;
+width: 150px;
 }
 :root {
-  --bg: #1a170f; --card: #1f1c14; --muted: #8a8a7c; --text: #f0e9d9; --accent: #d4a761; --accent2: #bfa33f; --danger: #bf6d3f; --ok: #a3bf3f;
+--bg: #1a170f; --card: #1f1c14; --muted: #8a8a7c; --text: #f0e9d9; --accent: #d4a761; --accent2: #bfa33f; --danger: #bf6d3f; --ok: #a3bf3f;
 }
 * { box-sizing: border-box; }
 html, body { height: 100%; margin: 0; font-family: Roboto, system-ui, -apple-system, Segoe UI, Arial; color: var(--text); background: radial-gradient(1200px 800px at 20% 10%, #252219, var(--bg)); }
@@ -45,138 +45,154 @@ html, body { height: 100%; margin: 0; font-family: Roboto, system-ui, -apple-sys
 #statusPanel span.equip { font-weight: bold; }
 #enemyInfo { display: flex; align-items: center; gap: 12px; background: #2a2a25; padding: 10px; border-radius: 8px; margin-top: 8px; }
 #enemyIcon { font-size: 30px; }
+#notification { position: fixed; top: 20px; right: 20px; background-color: #d4a761; color: var(--bg); padding: 10px 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); transition: opacity 0.5s ease-in-out; opacity: 0; z-index: 1000; }
 </style>
 </head>
 <body>
 <div class="container">
 
-<!-- Sistema de luta na linha superior -->
 <div id="lutaSistema">
-  <button onclick="encontrarInimigo()">Encontrar Inimigo</button>
-  <div id="enemyDisplay" style="display:flex; align-items:center; gap:10px;">
-    <div id="enemyIcon">?</div>
-    <div>
-      <div id="enemyNome">Nenhum inimigo</div>
-      <div>HP: <span id="enemyHP">0/0</span> / <span id="enemyMaxHP">0</span></div>
-    </div>
-    <button id="btnAtacar" disabled onclick="atacar()">Atacar</button>
-  </div>
+<button onclick="encontrarInimigo()">Encontrar Inimigo</button>
+<div id="enemyDisplay" style="display:flex; align-items:center; gap:10px;">
+<div id="enemyIcon">?</div>
+<div>
+<div id="enemyNome">Nenhum inimigo</div>
+<div>HP: <span id="enemyHP">0/0</span> / <span id="enemyMaxHP">0</span></div>
+</div>
+<button id="btnAtacar" disabled onclick="atacar()">Atacar</button>
+</div>
 </div>
 
 <div class="grid">
-  <!-- Esquerda: Status + Equipamentos -->
-  <aside class="panel" id="statusPanel">
-    <div class="pad">
-      <div class="title">⚔️ bAttle <span class="pill" id="rankTag">Nv 1</span></div>
-      
-      <!-- BARRAS -->
-      <div class="stat"><span>HP</span><span id="hpLabel">100/100</span></div>
-      <div class="bar"><span id="hpBar"></span></div>
-      
-      <div class="stat"><span>MP</span><span id="mpLabel">30/30</span></div>
-      <div class="bar"><span id="mpBar"></span></div>
-      
-      <div class="stat"><span>XP</span><span id="xpLabel">0 / 50</span></div>
-      <div class="bar"><span id="xpBar"></span></div>
-      
-      <div class="row" style="margin-top:10px">
-        <span class="pill">ATQ <b id="atkVal">10</b></span>
-        <span class="pill">DEF <b id="defVal">5</b></span>
-        <span class="pill">CRIT <b id="critVal">3%</b></span>
-        <span class="pill">OURO <b id="goldVal">0</b></span>
-      </div>
-      
-      <div class="section">
-        <h3>🎒 Inventário</h3>
-        <div id="inventory" class="list"></div>
-      </div>
-      
-      <div class="section">
-        <h3>🧰 Equipamento</h3>
-        <div class="equip-slot"><span class="muted">Arma</span><span id="eq-weapon">Nenhuma</span> <button class="buttonnn" style="background: #d4a761" onclick="equipItem('arma')">Equip</button></div>
-        <div class="equip-slot"><span class="muted">Off-hand</span><span id="eq-offhand">Nenhum</span> <button class="buttonnn" style="background: #d4a761" onclick="equipItem('off')">Equip</button></div>
-        <div class="equip-slot"><span class="muted">Amuleto</span><span id="eq-amulet">Nenhum</span> <button class="buttonnn" style="background: #d4a761" onclick="equipItem('amu')">Equip</button></div>
-      </div>
-    </div>
-  </aside>
-  
-  <!-- Direita: Loja + Lista de itens -->
-  <main class="panel" id="shopPanel">
-    <div class="pad">
-      <h2>Loja</h2>
-      <div id="filterButtons">
-        <button class="buttonnn" style="background: #d4a761" onclick="ordenarItens('asc')">Ordenar por Menor Preço</button>
-        <button class="buttonnn" style="background: #d4a761;" onclick="ordenarItens('desc')">Ordenar por Maior Preço</button>
-      </div>
-      <div id="itensContainer"></div>
-      
-      <h3>Comprar item</h3>
-      <p>Selecione um item para comprar e adicionar ao inventário.</p>
-    </div>
-  </main>
+<aside class="panel" id="statusPanel">
+<div class="pad">
+<div class="title">⚔️ bAttle <span class="pill" id="rankTag">Nv 1</span></div>
+
+<div class="stat"><span>HP</span><span id="hpLabel">100/100</span></div>
+<div class="bar"><span id="hpBar"></span></div>
+
+<div class="stat"><span>MP</span><span id="mpLabel">30/30</span></div>
+<div class="bar"><span id="mpBar"></span></div>
+
+<div class="stat"><span>XP</span><span id="xpLabel">0 / 50</span></div>
+<div class="bar"><span id="xpBar"></span></div>
+
+<div class="row" style="margin-top:10px">
+<span class="pill">ATQ <b id="atkVal">10</b></span>
+<span class="pill">DEF <b id="defVal">5</b></span>
+<span class="pill">CRIT <b id="critVal">3%</b></span>
+<span class="pill">OURO <b id="goldVal">0</b></span>
 </div>
 
-<!-- Lista de TODOS os itens no final -->
+<div class="section">
+<h3>🎒 Inventário</h3>
+<div id="inventory" class="list"></div>
+<button id="btnUsarPocao" class="buttonnn" style="background: #a3bf3f; margin-top: 10px;" onclick="usarPocao()">Usar Poção</button>
+</div>
+
+<div class="section">
+<h3>🧰 Equipamento</h3>
+<div class="equip-slot"><span class="muted">Arma</span><span id="eq-weapon">Nenhuma</span></div>
+<div class="equip-slot"><span class="muted">Off-hand</span><span id="eq-offhand">Nenhum</span></div>
+<div class="equip-slot"><span class="muted">Amuleto</span><span id="eq-amulet">Nenhum</span></div>
+</div>
+</div>
+</aside>
+
+<main class="panel" id="shopPanel">
+<div class="pad">
+<h2>Loja</h2>
+<div id="filterButtons">
+<button class="buttonnn" style="background: #d4a761" onclick="ordenarItens('asc')">Ordenar por Menor Preço</button>
+<button class="buttonnn" style="background: #d4a761;" onclick="ordenarItens('desc')">Ordenar por Maior Preço</button>
+</div>
+<div id="itensContainer"></div>
+
+<h3>Comprar item</h3>
+<p>Selecione um item para comprar e adicionar ao inventário.</p>
+</div>
+</main>
+</div>
+
 <div class="section" style="margin-top:20px;">
-  <h2>Lista Completa de 1000 Itens</h2>
-  <div id="todosItens"></div>
+<h2>Lista Completa de 1000 Itens</h2>
+<div id="todosItens"></div>
 </div>
 
 <div class="foot"> grind fácil até 10 · médio até 60 · XP reduzida no 100 · itens até 2.000.000 ouro</div>
+
+<div id="notification"></div>
+<button onclick="limparDados()" style="position:fixed; bottom:20px; right:20px; padding:8px 12px;">Limpar Dados</button>
 
 <script>
 // ========================
 // Geração de itens
 function gerarItens() {
-  const itens = [];
-  const nomes = ['Espada', 'Adaga', 'Lança', 'Escudo', 'Poção', 'Amuleto', 'Armadura', 'Elmo', 'Broquel', 'Cajado', 'Chicote', 'Disco', 'Cetro', 'Garras', 'Foice', 'Martelo'];
-  const elems = ['Fogo', 'Água', 'Terra', 'Vento', 'Luz', 'Trevas', 'Veneno', 'Impacto', 'Raio', 'Neutro', 'Sagrado'];
-  for(let i=1; i<=1000; i++){
-    const preco = Math.floor(Math.random()*2000000)+1; 
-    const tipoRand = Math.random();
-    let tipo = '';
-    if(tipoRand<0.3){ tipo='arma'; }
-    else if(tipoRand<0.5){ tipo='off'; }
-    else if(tipoRand<0.65){ tipo='amu'; }
-    else if(tipoRand<0.85){ tipo='consum'; }
-    else { tipo='equip'; }
-    const nomeBase = nomes[Math.floor(Math.random()*nomes.length)];
-    const elem = elems[Math.floor(Math.random()*elems.length)];
-    let item = { id:'auto'+i, nome:`${nomeBase} #${i}`, preco:preco, tipo:tipo };
-    if(tipo==='arma'){
-      item.min = Math.floor(Math.random()*10)+3;
-      item.max = item.min + Math.floor(Math.random()*10)+1;
-      item.crit = Math.floor(Math.random()*10)+1;
-      item.vel = (Math.random()*0.5+0.5).toFixed(2);
-      item.elem = elem;
-    } else if(tipo==='off'){
-      item.def = Math.floor(Math.random()*10)+2;
-      item.bloco = Math.floor(Math.random()*20)+10;
-    } else if(tipo==='amu'){
-      if(Math.random()<0.5) item.bonusHP = Math.floor(Math.random()*50)+10;
-      if(Math.random()<0.5) item.bonusCRIT = Math.floor(Math.random()*5)+1;
-      if(Math.random()<0.5) item.bonusMP = Math.floor(Math.random()*30)+5;
-      if(Math.random()<0.5) item.bonusATK = Math.floor(Math.random()*10)+1;
-    } else if(tipo==='consum'){
-      item.heal = Math.floor(Math.random()*50)+10;
-      if(Math.random()<0.3) item.mana = Math.floor(Math.random()*50)+10;
-    } else if(tipo==='equip'){
-      if(nomeBase==='Espada'){
-        item.min = Math.floor(Math.random()*10)+5;
-        item.max = item.min + Math.floor(Math.random()*10)+5;
-        item.elem = elems[Math.floor(Math.random()*elems.length)];
-      } else if(nomeBase==='Escudo'){
-        item.def = Math.floor(Math.random()*10)+3;
-        item.bloco = Math.floor(Math.random()*15)+5;
-      } else if(nomeBase==='Armadura'){
-        item.def = Math.floor(Math.random()*15)+5;
-      } else if(nomeBase==='Elmo'){
-        item.def = Math.floor(Math.random()*5)+2;
-      }
-    }
-    itens.push(item);
-  }
-  return itens;
+const itens = [];
+const nomes = ['Espada', 'Adaga', 'Lança', 'Escudo', 'Amuleto', 'Armadura', 'Elmo', 'Broquel', 'Cajado', 'Chicote', 'Disco', 'Cetro', 'Garras', 'Foice', 'Martelo'];
+const elems = ['Fogo', 'Água', 'Terra', 'Vento', 'Luz', 'Trevas', 'Veneno', 'Impacto', 'Raio', 'Neutro', 'Sagrado'];
+for(let i=1; i<=1000; i++){
+const tipoRand = Math.random();
+let preco;
+let tipo = '';
+let isEquipavel = true;
+let nomeItem;
+
+// Proporção 3:2:1
+if (tipoRand < 0.5) { // 50% - Itens baratos (1-100)
+preco = Math.floor(Math.random() * 100) + 1;
+const tiposEquip = ['equip', 'off', 'amu'];
+tipo = tiposEquip[Math.floor(Math.random() * tiposEquip.length)];
+nomeItem = nomes[Math.floor(Math.random() * nomes.length)];
+} else if (tipoRand < 0.833) { // 33.3% - Itens de preço médio (101-5000)
+preco = Math.floor(Math.random() * 4900) + 101;
+const tiposArma = ['arma', 'off', 'amu'];
+tipo = tiposArma[Math.floor(Math.random() * tiposArma.length)];
+nomeItem = nomes[Math.floor(Math.random() * nomes.length)];
+} else { // 16.7% - Itens caros (5001-5000000)
+preco = Math.floor(Math.random() * 4995000) + 5001;
+const tiposArma = ['arma', 'off', 'amu', 'equip'];
+tipo = tiposArma[Math.floor(Math.random() * tiposArma.length)];
+nomeItem = nomes[Math.floor(Math.random() * nomes.length)];
+}
+
+const elem = elems[Math.floor(Math.random()*elems.length)];
+let item = { id:'auto'+i, nome:`${nomeItem} #${i}`, preco:preco, tipo:tipo, isEquipavel:isEquipavel };
+
+// Atributos baseados no preço (a raiz cúbica suaviza a progressão)
+const statBase = Math.cbrt(preco);
+
+if(tipo==='arma'){
+item.min = Math.floor(statBase * 1.5) + 3;
+item.max = item.min + Math.floor(statBase) + 1;
+item.crit = Math.floor(statBase / 2) + 1;
+item.vel = (Math.random()*0.5+0.5).toFixed(2);
+item.elem = elem;
+} else if(tipo==='off'){
+item.def = Math.floor(statBase) + 2;
+item.bloco = Math.floor(statBase * 1.5) + 10;
+} else if(tipo==='amu'){
+if(Math.random()<0.5) item.bonusHP = Math.floor(statBase * 4) + 10;
+if(Math.random()<0.5) item.bonusCRIT = Math.floor(statBase / 3) + 1;
+if(Math.random()<0.5) item.bonusMP = Math.floor(statBase * 2) + 5;
+if(Math.random()<0.5) item.bonusATK = Math.floor(statBase / 2) + 1;
+} else if(tipo==='equip'){
+if(nomeItem==='Espada'){
+item.min = Math.floor(statBase * 1.5) + 5;
+item.max = item.min + Math.floor(statBase) + 5;
+item.elem = elems[Math.floor(Math.random()*elems.length)];
+} else if(nomeItem==='Escudo'){
+item.def = Math.floor(statBase * 1.5) + 3;
+item.bloco = Math.floor(statBase * 2) + 5;
+} else if(nomeItem==='Armadura'){
+item.def = Math.floor(statBase * 2) + 5;
+} else if(nomeItem==='Elmo'){
+item.def = Math.floor(statBase * 0.8) + 2;
+}
+}
+itens.push(item);
+}
+return itens;
 }
 const ITEMS = gerarItens();
 
@@ -186,116 +202,191 @@ let itensOrdenados = [...ITEMS];
 // ========================
 // Herói
 let heroi = {
-  nome:'Herói',
-  lv:1,
-  hp:100,
-  maxHp:100,
-  mp:30,
-  maxMp:30,
-  xp:0,
-  gold:0,
-  atk:10,
-  def:5,
-  crit:3,
-  elem:'Neutro',
-  inventory:[],
-  equipWeapon:null,
-  equipOffhand:null,
-  equipAmulet:null
+nome:'Herói',
+lv:1,
+hp:100,
+maxHp:100,
+mp:30,
+maxMp:30,
+xp:0,
+gold:0,
+atk:10,
+def:5,
+crit:3,
+elem:'Neutro',
+inventory:[],
+equipWeapon:null,
+equipOffhand:null,
+equipAmulet:null
 };
+
+// Itens iniciais
+const itemInicialArma = { id:'arma_inicial', nome:'Espada de Treino', preco:0, tipo:'arma', isEquipavel:true, min:5, max:10, crit:2, vel:1.0, elem:'Neutro' };
+const itemInicialPocao = { id:'pocao_inicial', nome:'Poção de Cura', preco:0, tipo:'consum', isEquipavel:false, heal: 100 };
 
 // Inimigo atual
 let inimigoAtual = null;
 
-// Lista de inimigos
+// Lista de inimigos e chefes
 const ENEMIES = [
-  { nome:'Esqueleto', hp:50, atk:8, def:2, icon:'💀', gold:[10,20], drops:[['Poção',0.3], ['Espada #1',0.1], ['Escudo #1',0.1]] },
-  { nome:'Múmia', hp:80, atk:12, def:4, icon:'🤕', gold:[20,50], drops:[['Poção',0.4], ['Amuleto #1',0.05], ['Lança #1',0.05]] },
-  { nome:'Faraó Fantasma', hp:120, atk:20, def:6, icon:'👻', gold:[50,100], drops:[['Poção',0.5], ['Cetro #1',0.05], ['Broquel #1',0.05]] }
+{ nome:'Esqueleto', hp:50, atk:8, def:2, icon:'💀', gold:[10,20], drops:[['Poção de Cura',0.3]] },
+{ nome:'Múmia', hp:80, atk:12, def:4, icon:'🤕', gold:[20,50], drops:[['Poção de Cura',0.4]] },
+{ nome:'Faraó Fantasma', hp:120, atk:20, def:6, icon:'👻', gold:[50,100], drops:[['Poção de Cura',0.5]] }
+];
+
+const BOSSES = [
+{ nome:'Lorde das Sombras', hp:500, atk:50, def:20, icon:'😈', gold:[500,1000], drops:[['Amuleto #990', 0.2]] },
+{ nome:'Dragão Ancião', hp:800, atk:80, def:30, icon:'🐉', gold:[1000,2000], drops:[['Espada #995', 0.2]] },
+{ nome:'Guerreiro Amaldiçoado', hp:600, atk:60, def:25, icon:'👹', gold:[700,1500], drops:[['Elmo #980', 0.2]] }
 ];
 
 const nomesExtras = ['Lobisomem', 'Gárgula', 'Dragão Pequeno', 'Goblin', 'Orc', 'Troll', 'Basilisco', 'Vampiro', 'Serpente Gigante', 'Manticora', 'Hidra', 'Súcubo', 'Quimera', 'Lamia', 'Harpia', 'Fênix', 'Minotauro', 'Espectro', 'Demonio', 'Verdadeiro Demônio', 'Lobo Sombrio', 'Esquilo Assassino', 'Rato Gigante', 'Aranha Mortal', 'Cobra Gigante', 'Leão Selvagem', 'Urso Selvagem', 'Lobo Polido', 'Saci', 'Bicho-Papão', 'Cuca', 'Sereia', 'Sirene', 'Naga'];
 for(let i=0; i<396; i++){
-  const nomeAleatorio = nomesExtras[Math.floor(Math.random()*nomesExtras.length)];
-  const hpBase=40+Math.floor(Math.random()*30);
-  const atkBase=6+Math.floor(Math.random()*6);
-  const defBase=2+Math.floor(Math.random()*3);
-  const goldMin=5+Math.floor(Math.random()*10);
-  const goldMax=goldMin+Math.floor(Math.random()*10);
-  ENEMIES.push({ nome:nomeAleatorio, hp:hpBase, atk:atkBase, def:defBase, icon:'👹', gold:[goldMin,goldMax], drops:[['Poção',0.2+Math.random()*0.3], ['Item raro',0.05]] });
+const nomeAleatorio = nomesExtras[Math.floor(Math.random()*nomesExtras.length)];
+const hpBase=40+Math.floor(Math.random()*30);
+const atkBase=6+Math.floor(Math.random()*6);
+const defBase=2+Math.floor(Math.random()*3);
+const goldMin=5+Math.floor(Math.random()*10);
+const goldMax=goldMin+Math.floor(Math.random()*10);
+ENEMIES.push({ nome:nomeAleatorio, hp:hpBase, atk:atkBase, def:defBase, icon:'👹', gold:[goldMin,goldMax], drops:[['Poção de Cura',0.2+Math.random()*0.3]] });
 }
 
 // ========================
 // Funções para salvar e carregar
 function salvarNoLocalStorage() {
-  localStorage.setItem('gameState', JSON.stringify(heroi));
+localStorage.setItem('gameState', JSON.stringify(heroi));
 }
 function carregarDoLocalStorage() {
-  const data = localStorage.getItem('gameState');
-  if (data) {
-    const p = JSON.parse(data);
-    Object.assign(heroi, p);
-  }
+const data = localStorage.getItem('gameState');
+if (data) {
+const p = JSON.parse(data);
+Object.assign(heroi, p);
+recalcularStatus(); // Recalcula status baseados nos equipamentos carregados
+}
+}
+
+// Função para limpar todos os dados do jogo
+function limparDados() {
+localStorage.clear();
+location.reload();
 }
 
 // ========================
 // Mostrar itens na loja
 function mostrarItens() {
-  const container = document.getElementById('itensContainer');
-  container.innerHTML = '';
-  for(let item of itensOrdenados){
-    container.innerHTML += `<div class="item-entry" style="display:flex; justify-content:space-between; align-items:center; padding:4px; border-bottom:1px solid #555;">
-      <div class="item-info"><b>${item.nome}</b> (${item.tipo}) - PO ${item.preco.toLocaleString()}</div>
-      <button class="buttonnn" onclick="comprarItem('${item.id}')">Comprar</button>
-    </div>`;
-  }
+const container = document.getElementById('itensContainer');
+container.innerHTML = '';
+for(let item of itensOrdenados){
+container.innerHTML += `<div class="item-entry" style="display:flex; justify-content:space-between; align-items:center; padding:4px; border-bottom:1px solid #555;">
+<div class="item-info"><b>${item.nome}</b> (${item.tipo}) - PO ${item.preco.toLocaleString()}</div>
+<button class="buttonnn" onclick="comprarItem('${item.id}')">Comprar</button>
+</div>`;
+}
 }
 
 // Ordenar itens
 function ordenarItens(ordem) {
-  if(ordem==='asc'){
-    itensOrdenados = [...ITEMS].sort((a,b)=>a.preco-b.preco);
-  } else {
-    itensOrdenados = [...ITEMS].sort((a,b)=>b.preco-a);
-  }
-  mostrarItens();
+if(ordem==='asc'){
+itensOrdenados = [...ITEMS].sort((a,b)=>a.preco-b.preco);
+} else {
+itensOrdenados = [...ITEMS].sort((a,b)=>b.preco-a.preco);
+}
+mostrarItens();
 }
 
 // Comprar item
 function comprarItem(id) {
-  const item = ITEMS.find(i=>i.id===id);
-  if(!item) return;
-  // Adiciona ao inventário
-  let invItem = heroi.inventory.find(i=>i.id===item.id);
-  if(invItem){
-    invItem.quantidade=(invItem.quantidade||1)+1;
-  } else {
-    heroi.inventory.push({ ...item, quantidade:1 });
-  }
-  alert(`Você comprou: ${item.nome}`);
-  atualizarInventario();
+const item = ITEMS.find(i=>i.id===id);
+if(!item) return;
+if(heroi.gold < item.preco){
+alert('Ouro insuficiente para comprar este item.');
+return;
+}
+heroi.gold -= item.preco;
+// Adiciona ao inventário
+let invItem = heroi.inventory.find(i=>i.id===item.id);
+if(invItem){
+invItem.quantidade=(invItem.quantidade||1)+1;
+} else {
+heroi.inventory.push({ ...item, quantidade:1 });
+}
+alert(`Você comprou: ${item.nome}`);
+atualizarInventario();
+atualizarStatus();
 }
 
 // Atualizar inventário
 function atualizarInventario() {
-  const div = document.getElementById('inventory');
-  div.innerHTML='';
-  heroi.inventory.forEach(i => {
-    div.innerHTML += `<div>${i.nome} x${i.quantidade}</div>`;
-  });
+const div = document.getElementById('inventory');
+div.innerHTML='';
+heroi.inventory.forEach(i => {
+let itemHtml = `<div>${i.nome} x${i.quantidade}`;
+if (i.isEquipavel) {
+itemHtml += ` <button class="buttonnn" style="background: #d4a761; font-size: 12px; padding: 2px 6px;" onclick="equiparItemDoInventario('${i.id}')">Equipar</button>`;
+}
+itemHtml += `</div>`;
+div.innerHTML += itemHtml;
+});
 }
 
-// Equipar itens
-function equipItem(tipo) {
-  let item=null;
-  if(tipo==='arma') item=heroi.equipWeapon;
-  if(tipo==='off') item=heroi.equipOffhand;
-  if(tipo==='amu') item=heroi.equipAmulet;
-  if(!item){ alert('Nenhum item equipado nesse slot!'); return; }
-  if(tipo==='arma'){ heroi.equipWeapon=item; document.getElementById('eq-weapon').textContent= item.nome; }
-  if(tipo==='off'){ heroi.equipOffhand=item; document.getElementById('eq-offhand').textContent= item.nome; }
-  if(tipo==='amu'){ heroi.equipAmulet=item; document.getElementById('eq-amulet').textContent= item.nome; }
-  salvarNoLocalStorage(); // salva após equipar
+// Equipar itens do inventário
+function equiparItemDoInventario(id) {
+const itemIndex = heroi.inventory.findIndex(i => i.id === id);
+if (itemIndex === -1) return;
+const item = heroi.inventory[itemIndex];
+
+let slotEquip = null;
+if (item.tipo === 'arma') slotEquip = 'equipWeapon';
+else if (item.tipo === 'off') slotEquip = 'equipOffhand';
+else if (item.tipo === 'amu') slotEquip = 'equipAmulet';
+else if (item.tipo === 'equip') slotEquip = 'equipWeapon'; // Assume equip vai para o slot de arma por padrão
+
+if (!slotEquip) {
+alert('Este item não pode ser equipado.');
+return;
+}
+
+const itemRemovido = heroi[slotEquip];
+heroi[slotEquip] = item;
+heroi.inventory.splice(itemIndex, 1);
+
+if (itemRemovido) {
+heroi.inventory.push(itemRemovido);
+alert(`Você removeu ${itemRemovido.nome} e equipou ${item.nome}.`);
+} else {
+alert(`Você equipou ${item.nome}.`);
+}
+
+recalcularStatus();
+atualizarStatus();
+}
+
+// Usar Poção
+function usarPocao() {
+const pocaoIndex = heroi.inventory.findIndex(i => i.nome.includes('Poção') && i.tipo === 'consum');
+if(pocaoIndex === -1){
+alert('Você não tem poções de HP no inventário.');
+return;
+}
+const pocao = heroi.inventory[pocaoIndex];
+heroi.hp = heroi.maxHp;
+pocao.quantidade--;
+if(pocao.quantidade <= 0){
+heroi.inventory.splice(pocaoIndex, 1);
+}
+alert(`Você usou uma poção e recuperou todo o seu HP.`);
+atualizarStatus();
+}
+
+// ========================
+// Funções de notificação
+function mostrarNotificacao(mensagem) {
+const notification = document.getElementById('notification');
+notification.textContent = mensagem;
+notification.style.opacity = '1';
+setTimeout(() => {
+notification.style.opacity = '0';
+}, 3000);
 }
 
 // ========================
@@ -303,80 +394,137 @@ function equipItem(tipo) {
 // ========================
 
 function encontrarInimigo() {
-  const inim = ENEMIES[Math.floor(Math.random()*ENEMIES.length)];
-  inimigoAtual = {...inim}; // copia
-  inimigoAtual.hpMax = inim.hp; // salva o valor máximo
-  document.getElementById('enemyIcon').textContent = inim.icon;
-  document.getElementById('enemyNome').textContent = inim.nome;
-  document.getElementById('enemyHP').textContent = `${inim.hp}/${inim.hp}`;
-  document.getElementById('enemyMaxHP').textContent = inim.hp; // valor fixo
-  document.getElementById('btnAtacar').disabled=false;
+// Chance de encontrar um chefe
+if (Math.random() < 0.05) { // 5% de chance
+const boss = BOSSES[Math.floor(Math.random() * BOSSES.length)];
+inimigoAtual = { ...boss };
+inimigoAtual.hpMax = boss.hp;
+mostrarNotificacao(`Um monstro muito forte apareceu: ${boss.nome}!`);
+} else {
+const inim = ENEMIES[Math.floor(Math.random() * ENEMIES.length)];
+inimigoAtual = { ...inim };
+inimigoAtual.hpMax = inim.hp;
+}
+document.getElementById('enemyIcon').textContent = inimigoAtual.icon;
+document.getElementById('enemyNome').textContent = inimigoAtual.nome;
+document.getElementById('enemyHP').textContent = `${inimigoAtual.hp}/${inimigoAtual.hp}`;
+document.getElementById('enemyMaxHP').textContent = inimigoAtual.hp;
+document.getElementById('btnAtacar').disabled = false;
 }
 
 function atacar() {
-  if(!inimigoAtual) return;
-  // Dano do herói
-  let danoHerói = Math.max(1, Math.floor(heroi.atk * (1 + Math.random()*0.5))) - (inimigoAtual.def || 0);
-  if(danoHerói<1) danoHerói=1;
-  inimigoAtual.hp -= danoHerói;
-  if(inimigoAtual.hp<0) inimigoAtual.hp=0;
-  // Atualiza o HP do inimigo
-  document.getElementById('enemyHP').textContent = `${inimigoAtual.hp}/${inimigoAtual.hpMax}`;
+if(!inimigoAtual) return;
+// Dano do herói
+let danoHerói = Math.max(1, Math.floor(heroi.atk * (1 + Math.random()*0.5))) - (inimigoAtual.def || 0);
+if(danoHerói<1) danoHerói=1;
+inimigoAtual.hp -= danoHerói;
+if(inimigoAtual.hp<0) inimigoAtual.hp=0;
+// Atualiza o HP do inimigo
+document.getElementById('enemyHP').textContent = `${inimigoAtual.hp}/${inimigoAtual.hpMax}`;
 
-  alert(`Você causou ${danoHerói} de dano!`);
+alert(`Você causou ${danoHerói} de dano!`);
 
-  if(inimigoAtual.hp<=0){
-    alert(`Inimigo ${inimigoAtual.nome} derrotado!`);
-    const ouroGanhos = Math.floor(Math.random()*(inimigoAtual.gold[1]-inimigoAtual.gold[0]+1))+inimigoAtual.gold[0];
-    heroi.gold+=ouroGanhos;
-    const xpGanhos = 10+Math.floor(Math.random()*10);
-    heroi.xp+=xpGanhos;
-    alert(`Ganhou ${ouroGanhos} ouro e ${xpGanhos} XP!`);
+if(inimigoAtual.hp<=0){
+alert(`Inimigo ${inimigoAtual.nome} derrotado!`);
+const ouroGanhos = Math.floor(Math.random()*(inimigoAtual.gold[1]-inimigoAtual.gold[0]+1))+inimigoAtual.gold[0];
+heroi.gold+=ouroGanhos;
+const xpGanhos = 10+Math.floor(Math.random()*10);
+heroi.xp+=xpGanhos;
+alert(`Ganhou ${ouroGanhos} ouro e ${xpGanhos} XP!`);
 
-    // Subir de nível
-    const xpNecessaria=heroi.lv*50;
-    if(heroi.xp>=xpNecessaria) {
-      heroi.lv++;
-      heroi.xp-=xpNecessaria;
-      heroi.maxHp+=10;
-      heroi.hp=heroi.maxHp;
-      heroi.maxMp+=5;
-      heroi.mp=heroi.maxMp;
-      alert(`Parabéns! Você subiu para o nível ${heroi.lv}!`);
-    }
-    atualizarInventario();
-    atualizarStatus();
-    salvarNoLocalStorage(); // salva após ganhar xp e subir de nível
+// Drop de item raro (somente se for um boss)
+if (inimigoAtual.drops && inimigoAtual.drops.length > 0) {
+for(const [itemName, dropChance] of inimigoAtual.drops){
+if (Math.random() < dropChance) {
+const itemDrop = ITEMS.find(i => i.nome === itemName);
+if (itemDrop) {
+let invItem = heroi.inventory.find(i=>i.id===itemDrop.id);
+if(invItem){
+invItem.quantidade=(invItem.quantidade||1)+1;
+} else {
+heroi.inventory.push({ ...itemDrop, quantidade:1 });
+}
+mostrarNotificacao(`Você recebeu um item raro: ${itemDrop.nome}!`);
+}
+}
+}
+}
 
-    // reset inimigo
-    inimigoAtual=null;
-    document.getElementById('enemyIcon').textContent='?';
-    document.getElementById('enemyNome').textContent='Nenhum inimigo';
-    document.getElementById('enemyHP').textContent='0/0';
-    document.getElementById('enemyMaxHP').textContent='0';
-    document.getElementById('btnAtacar').disabled=true;
-    return;
-  }
+// Subir de nível
+const xpNecessaria=heroi.lv*50;
+if(heroi.xp>=xpNecessaria) {
+heroi.lv++;
+heroi.xp-=xpNecessaria;
+heroi.maxHp+=10;
+heroi.hp=heroi.maxHp;
+heroi.maxMp+=5;
+heroi.mp=heroi.maxMp;
+alert(`Parabéns! Você subiu para o nível ${heroi.lv}!`);
+}
+atualizarInventario();
+atualizarStatus();
+salvarNoLocalStorage(); // salva após ganhar xp e subir de nível
 
-  // Inimigo ataca
-  const danoInimigo = Math.max(0, inimigoAtual.atk - heroi.def);
-  heroi.hp -= danoInimigo;
-  if(heroi.hp<0) heroi.hp=0;
-  alert(`${inimigoAtual.nome} causou ${danoInimigo} de dano em você!`);
-  if(heroi.hp<=0){
-    alert('Você morreu! O personagem foi resetado.');
-    resetHerói();
-  }
-  atualizarStatus();
-  salvarNoLocalStorage(); // salva após ataque
+// reset inimigo
+inimigoAtual=null;
+document.getElementById('enemyIcon').textContent='?';
+document.getElementById('enemyNome').textContent='Nenhum inimigo';
+document.getElementById('enemyHP').textContent='0/0';
+document.getElementById('enemyMaxHP').textContent='0';
+document.getElementById('btnAtacar').disabled=true;
+return;
+}
+
+// Inimigo ataca
+const danoInimigo = Math.max(0, inimigoAtual.atk - heroi.def);
+heroi.hp -= danoInimigo;
+if(heroi.hp<0) heroi.hp=0;
+alert(`${inimigoAtual.nome} causou ${danoInimigo} de dano em você!`);
+if(heroi.hp<=0){
+alert('Você morreu! O personagem foi resetado.');
+resetHerói();
+}
+atualizarStatus();
+salvarNoLocalStorage(); // salva após ataque
 }
 
 function resetHerói() {
-  heroi.hp=heroi.maxHp;
-  heroi.mp=heroi.maxMp;
-  heroi.xp=0;
-  heroi.gold=0;
-  salvarNoLocalStorage(); // salva o reset
+heroi.hp=heroi.maxHp;
+heroi.mp=heroi.maxMp;
+heroi.xp=0;
+heroi.gold=0;
+heroi.inventory = [{ ...itemInicialArma, quantidade: 1 }]; // Reseta com item inicial
+heroi.inventory.push({ ...itemInicialPocao, quantidade: 1 });
+heroi.equipWeapon=null;
+heroi.equipOffhand=null;
+heroi.equipAmulet=null;
+recalcularStatus();
+salvarNoLocalStorage(); // salva o reset
+}
+
+// Recalcular status do herói com base nos equipamentos
+function recalcularStatus() {
+// Status base
+heroi.atk = 10;
+heroi.def = 5;
+heroi.crit = 3;
+heroi.maxHp = 100 + (heroi.lv - 1) * 10; // Mantém o bônus de nível
+heroi.maxMp = 30 + (heroi.lv - 1) * 5; // Mantém o bônus de nível
+
+// Adiciona status dos equipamentos
+if (heroi.equipWeapon) {
+heroi.atk += heroi.equipWeapon.min || 0;
+heroi.crit += heroi.equipWeapon.crit || 0;
+}
+if (heroi.equipOffhand) {
+heroi.def += heroi.equipOffhand.def || 0;
+}
+if (heroi.equipAmulet) {
+heroi.maxHp += heroi.equipAmulet.bonusHP || 0;
+heroi.maxMp += heroi.equipAmulet.bonusMP || 0;
+heroi.crit += heroi.equipAmulet.bonusCRIT || 0;
+heroi.atk += heroi.equipAmulet.bonusATK || 0;
+}
 }
 
 // ========================
@@ -388,40 +536,43 @@ mostrarItens();
 // Atualiza a UI
 // ========================
 function atualizarStatus() {
-  document.getElementById('hpLabel').textContent = `${heroi.hp}/${heroi.maxHp}`;
-  document.getElementById('hpBar').style.width = (heroi.hp / heroi.maxHp * 100) + '%';
+document.getElementById('hpLabel').textContent = `${heroi.hp}/${heroi.maxHp}`;
+document.getElementById('hpBar').style.width = (heroi.hp / heroi.maxHp * 100) + '%';
 
-  document.getElementById('mpLabel').textContent = `${heroi.mp}/${heroi.maxMp}`;
-  document.getElementById('mpBar').style.width = (heroi.mp / heroi.maxMp * 100) + '%';
+document.getElementById('mpLabel').textContent = `${heroi.mp}/${heroi.maxMp}`;
+document.getElementById('mpBar').style.width = (heroi.mp / heroi.maxMp * 100) + '%';
 
-  const xpNecessaria=heroi.lv*50;
-  document.getElementById('xpLabel').textContent = `${heroi.xp} / ${xpNecessaria}`;
-  document.getElementById('xpBar').style.width = (heroi.xp / xpNecessaria * 100) + '%';
+const xpNecessaria=heroi.lv*50;
+document.getElementById('xpLabel').textContent = `${heroi.xp} / ${xpNecessaria}`;
+document.getElementById('xpBar').style.width = (heroi.xp / xpNecessaria * 100) + '%';
 
-  document.getElementById('rankTag').textContent = `Nv ${heroi.lv}`;
-  document.getElementById('goldVal').textContent = heroi.gold;
-  document.getElementById('atkVal').textContent=heroi.atk;
-  document.getElementById('defVal').textContent=heroi.def;
-  document.getElementById('critVal').textContent=heroi.crit+'%';
+document.getElementById('rankTag').textContent = `Nv ${heroi.lv}`;
+document.getElementById('goldVal').textContent = heroi.gold;
+document.getElementById('atkVal').textContent=heroi.atk;
+document.getElementById('defVal').textContent=heroi.def;
+document.getElementById('critVal').textContent=heroi.crit+'%';
 
-  // Atualiza equipamentos na UI
-  document.getElementById('eq-weapon').textContent=heroi.equipWeapon?heroi.equipWeapon.nome:'Nenhuma';
-  document.getElementById('eq-offhand').textContent=heroi.equipOffhand?heroi.equipOffhand.nome:'Nenhum';
-  document.getElementById('eq-amulet').textContent=heroi.equipAmulet?heroi.equipAmulet.nome:'Nenhum';
+// Atualiza equipamentos na UI
+document.getElementById('eq-weapon').textContent=heroi.equipWeapon?heroi.equipWeapon.nome:'Nenhuma';
+document.getElementById('eq-offhand').textContent=heroi.equipOffhand?heroi.equipOffhand.nome:'Nenhum';
+document.getElementById('eq-amulet').textContent=heroi.equipAmulet?heroi.equipAmulet.nome:'Nenhum';
 
-  // Atualiza inventário
-  atualizarInventario();
+// Atualiza inventário
+atualizarInventario();
 
-  // Salva toda vez que atualiza
-  salvarNoLocalStorage();
+// Salva toda vez que atualiza
+salvarNoLocalStorage();
 }
 
 // ========================
 // Carregar o estado salvo ao iniciar
 // ========================
+if(heroi.inventory.length === 0) {
+heroi.inventory.push({ ...itemInicialArma, quantidade: 1 });
+heroi.inventory.push({ ...itemInicialPocao, quantidade: 1 });
+}
 carregarDoLocalStorage();
 atualizarStatus();
-
 </script>
 </body>
 </html>
