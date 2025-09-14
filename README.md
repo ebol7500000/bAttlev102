@@ -1,4 +1,4 @@
-# bAttle - Jogo de RPG Textual (Desktop Game)
+# bAttle - Jogo de RPG Textual 
 
 Um simples jogo de RPG por turnos, totalmente em uma única página HTML, onde você derrota monstros, coleta ouro, equipa itens e fica mais forte.
 
