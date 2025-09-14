@@ -4,6 +4,8 @@ Um simples jogo de RPG por turnos, totalmente em uma única página HTML, onde v
 
 ---
 
+# Site do jogo: https://battlev102.netlify.app/splash.html​ (onde joga)
+
 ### **Sumário**
 1.  [Visão Geral](#visão-geral)
 2.  [Como Jogar](#como-jogar)
