@@ -52,121 +52,121 @@ html, body { height: 100%; margin: 0; font-family: Roboto, system-ui, -apple-sys
 /* --- Início do Código Responsivo (Tema Egípcio) --- */
 @media (max-width: 900px) {
 :root {
-  --bg: #2b261b; /* Fundo mais escuro */
-  --card: #3f3929; /* Card de papiro */
-  --muted: #c9c3ac; /* Texto sutil */
-  --text: #fef8dd; /* Cor de areia */
-  --accent: #e2b714; /* Dourado */
-  --accent2: #b47f0e; /* Ouro antigo */
-  --danger: #9c3c1e; /* Vermelho ferrugem */
-  --ok: #3a8a3f; /* Verde antigo */
+  --bg: #2b261b; /* Fundo mais escuro */
+  --card: #3f3929; /* Card de papiro */
+  --muted: #c9c3ac; /* Texto sutil */
+  --text: #fef8dd; /* Cor de areia */
+  --accent: #e2b714; /* Dourado */
+  --accent2: #b47f0e; /* Ouro antigo */
+  --danger: #9c3c1e; /* Vermelho ferrugem */
+  --ok: #3a8a3f; /* Verde antigo */
 }
 
 body {
-  background: #2b261b;
-  font-family: 'Times New Roman', serif;
-  font-weight: 400;
+  background: #2b261b;
+  font-family: 'Times New Roman', serif;
+  font-weight: 400;
 }
 
 /* Layout principal para mobile */
 .grid {
-  grid-template-columns: 1fr;
+  grid-template-columns: 1fr;
 }
 
 .panel {
-  border-radius: 0;
-  box-shadow: none;
-  border: 2px solid var(--accent);
-  border-left: none;
-  border-right: none;
-  background: var(--card);
+  border-radius: 0;
+  box-shadow: none;
+  border: 2px solid var(--accent);
+  border-left: none;
+  border-right: none;
+  background: var(--card);
 }
 
 .panel:first-of-type {
-  border-top: none;
+  border-top: none;
 }
 
 .pad {
-  padding: 10px;
+  padding: 10px;
 }
 
 /* Estilo do título e pilhas */
 .title {
-  font-family: 'Papyrus', 'Georgia', serif;
-  font-size: 24px;
-  justify-content: center;
-  margin-bottom: 15px;
-  color: var(--accent);
+  font-family: 'Papyrus', 'Georgia', serif;
+  font-size: 24px;
+  justify-content: center;
+  margin-bottom: 15px;
+  color: var(--accent);
 }
 
 .pill {
-  background: var(--accent);
-  color: var(--bg);
-  border-radius: 4px;
-  padding: 2px 6px;
-  font-weight: bold;
-  text-transform: uppercase;
+  background: var(--accent);
+  color: var(--bg);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-weight: bold;
+  text-transform: uppercase;
 }
 
 /* Ajustes nas barras de status */
 #hpBar, #mpBar, #xpBar {
-  width: 100%;
+  width: 100%;
 }
 
 #lutaSistema {
-  flex-direction: column;
-  align-items: stretch;
-  padding: 10px;
-  background: var(--card);
-  border-radius: 0;
-  border: 2px solid var(--accent);
-  border-bottom: none;
-  border-left: none;
-  border-right: none;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 10px;
+  background: var(--card);
+  border-radius: 0;
+  border: 2px solid var(--accent);
+  border-bottom: none;
+  border-left: none;
+  border-right: none;
 }
 
 #lutaSistema button {
-  background: var(--accent);
-  color: var(--bg);
-  font-weight: 700;
-  width: 100%;
-  margin-top: 8px;
+  background: var(--accent);
+  color: var(--bg);
+  font-weight: 700;
+  width: 100%;
+  margin-top: 8px;
 }
 
 #enemyDisplay {
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
 /* Itens da loja e inventário */
 .item-entry {
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 5px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
 }
 
 .buttonnn {
-  width: 100%;
-  margin-top: 5px;
+  width: 100%;
+  margin-top: 5px;
 }
 
 #inventory .buttonnn {
-  width: auto;
-  margin-top: 0;
-  font-size: 14px;
-  padding: 4px 8px;
+  width: auto;
+  margin-top: 0;
+  font-size: 14px;
+  padding: 4px 8px;
 }
 
 #notification {
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 80%;
-  text-align: center;
-  background: var(--accent);
-  color: var(--bg);
-  border: 2px solid var(--accent2);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+  text-align: center;
+  background: var(--accent);
+  color: var(--bg);
+  border: 2px solid var(--accent2);
 }
 }
 /* --- Fim do Código Responsivo --- */
@@ -185,6 +185,7 @@ body {
 </div>
 <button id="btnAtacar" disabled onclick="atacar()">Atacar</button>
 </div>
+<a href= "cust_scene_getting_out.gif"><button id="btnSair" onclick="sairDoCombate()" style="background: #d4a761; font-weight: 700;">Sair</button></a>
 </div>
 
 <div class="grid">
@@ -254,6 +255,9 @@ body {
 <div id="notification"></div>
 <button onclick="limparDados()" style="position:fixed; bottom:20px; right:20px; padding:8px 12px;">Limpar Dados</button>
 
+<div id="videoContainer" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 9999; display: none;">
+    <video id="cutsceneVideo" src="./cust_scene_getting_out.mp4" style="width: 100%; height: 100%; object-fit: contain;"></video>
+</div>
 <script>
 // ========================
 // Geração de itens
@@ -564,7 +568,42 @@ document.getElementById('enemyNome').textContent = inimigoAtual.nome;
 document.getElementById('enemyHP').textContent = `${inimigoAtual.hp}/${inimigoAtual.hp}`;
 document.getElementById('enemyMaxHP').textContent = inimigoAtual.hp;
 document.getElementById('btnAtacar').disabled = false;
+document.getElementById('btnSair').disabled = false; // Habilita o Sair
 }
+
+// Função para sair do combate (ATUALIZADA)
+function sairDoCombate() {
+    if (!inimigoAtual) return;
+
+    // 1. Oculta a interface do jogo (opcional, mas bom para focar no vídeo)
+    document.querySelector('.container').style.display = 'none';
+    document.getElementById('lutaSistema').style.display = 'none';
+
+    // 2. Prepara e exibe o container do vídeo
+    const videoContainer = document.getElementById('videoContainer');
+    const cutsceneVideo = document.getElementById('cutsceneVideo');
+
+    videoContainer.style.display = 'block';
+
+    // 3. Define a ação ao finalizar o vídeo
+    cutsceneVideo.onended = function() {
+        // Tenta fechar a aba/janela (na maioria dos navegadores só funciona se for aberta pelo script)
+        window.close();
+        
+        // Ou, uma alternativa mais confiável: reseta o jogo (simulando o "fechamento" para a página inicial)
+        alert('O jogo será reiniciado. Fim da cutscene!');
+        location.reload(); 
+    };
+
+    // 4. Inicia a reprodução
+    // Nota: Navegadores modernos podem bloquear a reprodução automática.
+    cutsceneVideo.play().catch(error => {
+        // Caso o play seja bloqueado (comum em navegadores):
+        alert('Falha ao iniciar a cutscene. Clique em OK para reiniciar o jogo.');
+        location.reload();
+    });
+}
+
 
 function atacar() {
 if(!inimigoAtual) return;
@@ -626,6 +665,7 @@ document.getElementById('enemyNome').textContent='Nenhum inimigo';
 document.getElementById('enemyHP').textContent='0/0';
 document.getElementById('enemyMaxHP').textContent='0';
 document.getElementById('btnAtacar').disabled=true;
+document.getElementById('btnSair').disabled = true; // Desabilita o Sair
 return;
 }
 
