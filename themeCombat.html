@@ -256,7 +256,7 @@ body {
 <button onclick="limparDados()" style="position:fixed; bottom:20px; right:20px; padding:8px 12px;">Limpar Dados</button>
 
 <div id="videoContainer" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 9999; display: none;">
-    <video id="cutsceneVideo" src="./cust_scene_getting_out.mp4" style="width: 100%; height: 100%; object-fit: contain;"></video>
+    <video id="cutsceneVideo" src="./cust_scene_getting_out.mp4" style="width: 100%; height: 100%; object-fit: contain;"></video>
 </div>
 <script>
 // ========================
@@ -408,26 +408,66 @@ location.reload();
 }
 
 // ========================
-// Mostrar itens na loja com paginação
-function mostrarItens() {
-const container = document.getElementById('itensContainer');
-container.innerHTML = '';
-
-const inicio = (paginaAtual - 1) * ITENS_POR_PAGINA;
-const fim = inicio + ITENS_POR_PAGINA;
-const itensNaPagina = itensOrdenados.slice(inicio, fim);
-
-for(let item of itensNaPagina){
-container.innerHTML += `<div class="item-entry" style="display:flex; justify-content:space-between; align-items:center; padding:4px; border-bottom:1px solid #555;">
-<div class="item-info"><b>${item.nome}</b> (${item.tipo}) - PO ${item.preco.toLocaleString()}</div>
-<button class="buttonnn" onclick="comprarItem('${item.id}')">Comprar</button>
-</div>`;
+// Funções de notificação
+function mostrarNotificacao(mensagem) {
+const notification = document.getElementById('notification');
+notification.textContent = mensagem;
+notification.style.opacity = '1';
+setTimeout(() => {
+notification.style.opacity = '0';
+}, 3000);
 }
 
-// Atualiza os controles de paginação
-document.getElementById('pageInfo').textContent = `Página ${paginaAtual} de ${Math.ceil(ITEMS.length / ITENS_POR_PAGINA)}`;
-document.getElementById('prevPageBtn').disabled = paginaAtual === 1;
-document.getElementById('nextPageBtn').disabled = paginaAtual === Math.ceil(ITEMS.length / ITENS_POR_PAGINA);
+// ==========================================================
+// FUNÇÕES DE EXIBIÇÃO DE ITENS (COM ATRIBUTOS) - ALTERAÇÃO AQUI
+// ==========================================================
+
+// Função auxiliar para formatar os atributos de um item em HTML
+function formatarAtributos(item) {
+    let html = '';
+    const stats = [];
+
+    if (item.min && item.max) stats.push(`ATK: ${item.min}-${item.max}`);
+    if (item.crit) stats.push(`CRIT: +${item.crit}%`);
+    if (item.def) stats.push(`DEF: +${item.def}`);
+    if (item.bloco) stats.push(`BLOCO: ${item.bloco}%`);
+    if (item.elem) stats.push(`Elemento: ${item.elem}`);
+    if (item.bonusHP) stats.push(`Bônus HP: +${item.bonusHP}`);
+    if (item.bonusMP) stats.push(`Bônus MP: +${item.bonusMP}`);
+    if (item.bonusATK) stats.push(`Bônus ATK: +${item.bonusATK}`);
+    if (item.bonusCRIT) stats.push(`Bônus CRIT: +${item.bonusCRIT}%`);
+    if (item.heal) stats.push(`Cura: ${item.heal} HP`);
+
+    if (stats.length > 0) {
+        html = `<span style="font-size: 12px; color: var(--muted); margin-left: 10px;">(${stats.join(' | ')})</span>`;
+    }
+    return html;
+}
+
+// 1. Mostrar itens na loja com paginação (ATUALIZADA)
+function mostrarItens() {
+    const container = document.getElementById('itensContainer');
+    container.innerHTML = '';
+
+    const inicio = (paginaAtual - 1) * ITENS_POR_PAGINA;
+    const fim = inicio + ITENS_POR_PAGINA;
+    const itensNaPagina = itensOrdenados.slice(inicio, fim);
+
+    for(let item of itensNaPagina){
+        const statsHtml = formatarAtributos(item);
+        container.innerHTML += `<div class="item-entry" style="display:flex; justify-content:space-between; align-items:center; padding:4px; border-bottom:1px solid #555;">
+            <div class="item-info">
+                <b>${item.nome}</b> (${item.tipo}) ${statsHtml}<br>
+                Preço: PO ${item.preco.toLocaleString()}
+            </div>
+            <button class="buttonnn" onclick="comprarItem('${item.id}')">Comprar</button>
+        </div>`;
+    }
+
+    // Atualiza os controles de paginação
+    document.getElementById('pageInfo').textContent = `Página ${paginaAtual} de ${Math.ceil(ITEMS.length / ITENS_POR_PAGINA)}`;
+    document.getElementById('prevPageBtn').disabled = paginaAtual === 1;
+    document.getElementById('nextPageBtn').disabled = paginaAtual === Math.ceil(ITEMS.length / ITENS_POR_PAGINA);
 }
 
 // Ordenar itens e resetar a página para a primeira
@@ -473,18 +513,20 @@ atualizarInventario();
 atualizarStatus();
 }
 
-// Atualizar inventário
+// 2. Atualizar inventário (ATUALIZADA)
 function atualizarInventario() {
-const div = document.getElementById('inventory');
-div.innerHTML='';
-heroi.inventory.forEach(i => {
-let itemHtml = `<div>${i.nome} x${i.quantidade}`;
-if (i.isEquipavel) {
-itemHtml += ` <button class="buttonnn" style="background: #d4a761; font-size: 12px; padding: 2px 6px;" onclick="equiparItemDoInventario('${i.id}')">Equipar</button>`;
-}
-itemHtml += `</div>`;
-div.innerHTML += itemHtml;
-});
+    const div = document.getElementById('inventory');
+    div.innerHTML='';
+    heroi.inventory.forEach(i => {
+        const statsHtml = formatarAtributos(i);
+        let itemHtml = `<div style="display: flex; justify-content: space-between; align-items: center;">
+            <div><b>${i.nome}</b> x${i.quantidade} ${statsHtml}</div>`;
+        if (i.isEquipavel) {
+            itemHtml += ` <button class="buttonnn" style="background: #d4a761; font-size: 12px; padding: 2px 6px;" onclick="equiparItemDoInventario('${i.id}')">Equipar</button>`;
+        }
+        itemHtml += `</div>`;
+        div.innerHTML += itemHtml;
+    });
 }
 
 // Equipar itens do inventário
@@ -537,18 +579,7 @@ atualizarStatus();
 }
 
 // ========================
-// Funções de notificação
-function mostrarNotificacao(mensagem) {
-const notification = document.getElementById('notification');
-notification.textContent = mensagem;
-notification.style.opacity = '1';
-setTimeout(() => {
-notification.style.opacity = '0';
-}, 3000);
-}
-
-// ========================
-// Sistema de luta
+// Sistema de luta (mantido)
 // ========================
 
 function encontrarInimigo() {
@@ -573,35 +604,35 @@ document.getElementById('btnSair').disabled = false; // Habilita o Sair
 
 // Função para sair do combate (ATUALIZADA)
 function sairDoCombate() {
-    if (!inimigoAtual) return;
+    if (!inimigoAtual) return;
 
-    // 1. Oculta a interface do jogo (opcional, mas bom para focar no vídeo)
-    document.querySelector('.container').style.display = 'none';
-    document.getElementById('lutaSistema').style.display = 'none';
+    // 1. Oculta a interface do jogo (opcional, mas bom para focar no vídeo)
+    document.querySelector('.container').style.display = 'none';
+    document.getElementById('lutaSistema').style.display = 'none';
 
-    // 2. Prepara e exibe o container do vídeo
-    const videoContainer = document.getElementById('videoContainer');
-    const cutsceneVideo = document.getElementById('cutsceneVideo');
+    // 2. Prepara e exibe o container do vídeo
+    const videoContainer = document.getElementById('videoContainer');
+    const cutsceneVideo = document.getElementById('cutsceneVideo');
 
-    videoContainer.style.display = 'block';
+    videoContainer.style.display = 'block';
 
-    // 3. Define a ação ao finalizar o vídeo
-    cutsceneVideo.onended = function() {
-        // Tenta fechar a aba/janela (na maioria dos navegadores só funciona se for aberta pelo script)
-        window.close();
-        
-        // Ou, uma alternativa mais confiável: reseta o jogo (simulando o "fechamento" para a página inicial)
-        alert('O jogo será reiniciado. Fim da cutscene!');
-        location.reload(); 
-    };
+    // 3. Define a ação ao finalizar o vídeo
+    cutsceneVideo.onended = function() {
+        // Tenta fechar a aba/janela (na maioria dos navegadores só funciona se for aberta pelo script)
+        window.close();
+        
+        // Ou, uma alternativa mais confiável: reseta o jogo (simulando o "fechamento" para a página inicial)
+        alert('O jogo será reiniciado. Fim da cutscene!');
+        location.reload(); 
+    };
 
-    // 4. Inicia a reprodução
-    // Nota: Navegadores modernos podem bloquear a reprodução automática.
-    cutsceneVideo.play().catch(error => {
-        // Caso o play seja bloqueado (comum em navegadores):
-        alert('Falha ao iniciar a cutscene. Clique em OK para reiniciar o jogo.');
-        location.reload();
-    });
+    // 4. Inicia a reprodução
+    // Nota: Navegadores modernos podem bloquear a reprodução automática.
+    cutsceneVideo.play().catch(error => {
+        // Caso o play seja bloqueado (comum em navegadores):
+        alert('Falha ao iniciar a cutscene. Clique em OK para reiniciar o jogo.');
+        location.reload();
+    });
 }
 
 
@@ -727,7 +758,7 @@ heroi.atk += heroi.equipAmulet.bonusATK || 0;
 mostrarItens();
 
 // ========================
-// Atualiza a UI
+// 3. Atualiza a UI (incluindo Equipamento) (ATUALIZADA)
 // ========================
 function atualizarStatus() {
 document.getElementById('hpLabel').textContent = `${heroi.hp}/${heroi.maxHp}`;
@@ -746,10 +777,18 @@ document.getElementById('atkVal').textContent=heroi.atk;
 document.getElementById('defVal').textContent=heroi.def;
 document.getElementById('critVal').textContent=heroi.crit+'%';
 
-// Atualiza equipamentos na UI
-document.getElementById('eq-weapon').textContent=heroi.equipWeapon?heroi.equipWeapon.nome:'Nenhuma';
-document.getElementById('eq-offhand').textContent=heroi.equipOffhand?heroi.equipOffhand.nome:'Nenhum';
-document.getElementById('eq-amulet').textContent=heroi.equipAmulet?heroi.equipAmulet.nome:'Nenhum';
+// Atualiza equipamentos na UI com os stats
+const weaponName = heroi.equipWeapon ? heroi.equipWeapon.nome : 'Nenhuma';
+const weaponStats = heroi.equipWeapon ? formatarAtributos(heroi.equipWeapon) : '';
+document.getElementById('eq-weapon').innerHTML = `${weaponName} ${weaponStats}`;
+
+const offhandName = heroi.equipOffhand ? heroi.equipOffhand.nome : 'Nenhum';
+const offhandStats = heroi.equipOffhand ? formatarAtributos(heroi.equipOffhand) : '';
+document.getElementById('eq-offhand').innerHTML = `${offhandName} ${offhandStats}`;
+
+const amuletName = heroi.equipAmulet ? heroi.equipAmulet.nome : 'Nenhum';
+const amuletStats = heroi.equipAmulet ? formatarAtributos(heroi.equipAmulet) : '';
+document.getElementById('eq-amulet').innerHTML = `${amuletName} ${amuletStats}`;
 
 // Atualiza inventário
 atualizarInventario();
