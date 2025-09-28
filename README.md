@@ -4,6 +4,10 @@ Um simples jogo de RPG por turnos, totalmente em uma única página HTML, onde v
 
 ---
 
+Powered by AI
+
+---
+
 #### Site do jogo: https://battlev102.netlify.app/splash.html​ (onde joga)
 
 ---
