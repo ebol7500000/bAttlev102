@@ -49,124 +49,203 @@ html, body { height: 100%; margin: 0; font-family: Roboto, system-ui, -apple-sys
 #notification { position: fixed; top: 20px; right: 20px; background-color: #d4a761; color: var(--bg); padding: 10px 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); transition: opacity 0.5s ease-in-out; opacity: 0; z-index: 1000; }
 /* --- Fim do Código CSS Original --- */
 
+/* --- Estilos para o Filtro de Pesquisa --- */
+.search-container {
+    position: relative;
+    width: 38%;
+    margin-left: auto;
+}
+
+.search-input {
+    width: 100%;
+    padding: 10px 15px;
+    background: var(--bg);
+    border: 2px solid var(--accent);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 14px;
+    outline: none;
+}
+
+.search-input::placeholder {
+    color: var(--muted);
+}
+
+.search-input:focus {
+    border-color: var(--accent2);
+    box-shadow: 0 0 5px var(--accent);
+}
+
+.search-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--card);
+    border: 2px solid var(--accent);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none;
+}
+
+.search-result-item {
+    padding: 10px 15px;
+    border-bottom: 1px solid #323025;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.search-result-item:hover {
+    background: var(--accent);
+    color: var(--bg);
+}
+
+.search-result-item:last-child {
+    border-bottom: none;
+}
+
+.search-result-name {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.search-result-stats {
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.search-result-item:hover .search-result-stats {
+    color: var(--bg);
+}
+
 /* --- Início do Código Responsivo (Tema Egípcio) --- */
 @media (max-width: 900px) {
 :root {
-  --bg: #2b261b; /* Fundo mais escuro */
-  --card: #3f3929; /* Card de papiro */
-  --muted: #c9c3ac; /* Texto sutil */
-  --text: #fef8dd; /* Cor de areia */
-  --accent: #e2b714; /* Dourado */
-  --accent2: #b47f0e; /* Ouro antigo */
-  --danger: #9c3c1e; /* Vermelho ferrugem */
-  --ok: #3a8a3f; /* Verde antigo */
+  --bg: #2b261b; /* Fundo mais escuro */
+  --card: #3f3929; /* Card de papiro */
+  --muted: #c9c3ac; /* Texto sutil */
+  --text: #fef8dd; /* Cor de areia */
+  --accent: #e2b714; /* Dourado */
+  --accent2: #b47f0e; /* Ouro antigo */
+  --danger: #9c3c1e; /* Vermelho ferrugem */
+  --ok: #3a8a3f; /* Verde antigo */
 }
 
 body {
-  background: #2b261b;
-  font-family: 'Times New Roman', serif;
-  font-weight: 400;
+  background: #2b261b;
+  font-family: 'Times New Roman', serif;
+  font-weight: 400;
 }
 
 /* Layout principal para mobile */
 .grid {
-  grid-template-columns: 1fr;
+  grid-template-columns: 1fr;
 }
 
 .panel {
-  border-radius: 0;
-  box-shadow: none;
-  border: 2px solid var(--accent);
-  border-left: none;
-  border-right: none;
-  background: var(--card);
+  border-radius: 0;
+  box-shadow: none;
+  border: 2px solid var(--accent);
+  border-left: none;
+  border-right: none;
+  background: var(--card);
 }
 
 .panel:first-of-type {
-  border-top: none;
+  border-top: none;
 }
 
 .pad {
-  padding: 10px;
+  padding: 10px;
 }
 
 /* Estilo do título e pilhas */
 .title {
-  font-family: 'Papyrus', 'Georgia', serif;
-  font-size: 24px;
-  justify-content: center;
-  margin-bottom: 15px;
-  color: var(--accent);
+  font-family: 'Papyrus', 'Georgia', serif;
+  font-size: 24px;
+  justify-content: center;
+  margin-bottom: 15px;
+  color: var(--accent);
 }
 
 .pill {
-  background: var(--accent);
-  color: var(--bg);
-  border-radius: 4px;
-  padding: 2px 6px;
-  font-weight: bold;
-  text-transform: uppercase;
+  background: var(--accent);
+  color: var(--bg);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-weight: bold;
+  text-transform: uppercase;
 }
 
 /* Ajustes nas barras de status */
 #hpBar, #mpBar, #xpBar {
-  width: 100%;
+  width: 100%;
 }
 
 #lutaSistema {
-  flex-direction: column;
-  align-items: stretch;
-  padding: 10px;
-  background: var(--card);
-  border-radius: 0;
-  border: 2px solid var(--accent);
-  border-bottom: none;
-  border-left: none;
-  border-right: none;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 10px;
+  background: var(--card);
+  border-radius: 0;
+  border: 2px solid var(--accent);
+  border-bottom: none;
+  border-left: none;
+  border-right: none;
 }
 
 #lutaSistema button {
-  background: var(--accent);
-  color: var(--bg);
-  font-weight: 700;
-  width: 100%;
-  margin-top: 8px;
+  background: var(--accent);
+  color: var(--bg);
+  font-weight: 700;
+  width: 100%;
+  margin-top: 8px;
 }
 
 #enemyDisplay {
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
 /* Itens da loja e inventário */
 .item-entry {
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 5px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
 }
 
 .buttonnn {
-  width: 100%;
-  margin-top: 5px;
+  width: 100%;
+  margin-top: 5px;
 }
 
 #inventory .buttonnn {
-  width: auto;
-  margin-top: 0;
-  font-size: 14px;
-  padding: 4px 8px;
+  width: auto;
+  margin-top: 0;
+  font-size: 14px;
+  padding: 4px 8px;
 }
 
 #notification {
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 80%;
-  text-align: center;
-  background: var(--accent);
-  color: var(--bg);
-  border: 2px solid var(--accent2);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+  text-align: center;
+  background: var(--accent);
+  color: var(--bg);
+  border: 2px solid var(--accent2);
+}
+
+/* Ajustes para o filtro em mobile */
+.search-container {
+    width: 100%;
+    margin-left: 0;
+    margin-bottom: 10px;
 }
 }
 /* --- Fim do Código Responsivo --- */
@@ -226,7 +305,14 @@ body {
 
 <main class="panel" id="shopPanel">
 <div class="pad">
-<h2>Loja</h2>
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+    <h2 style="margin: 0;">Loja</h2>
+    <div class="search-container">
+        <input type="text" class="search-input" placeholder="Pesquisar itens..." id="searchInput">
+        <div class="search-results" id="searchResults"></div>
+    </div>
+</div>
+
 <div id="filterButtons" style="margin-bottom: 10px;">
 <button class="buttonnn" style="background: #d4a761" onclick="ordenarItens('asc')">Ordenar por Menor Preço</button>
 <button class="buttonnn" style="background: #d4a761;" onclick="ordenarItens('desc')">Ordenar por Maior Preço</button>
@@ -253,10 +339,9 @@ body {
 <div class="foot"> grind fácil até 10 · médio até 60 · XP reduzida no 100 · itens até 2.000.000 ouro</div>
 
 <div id="notification"></div>
-<button onclick="limparDados()" style="position:fixed; bottom:20px; right:20px; padding:8px 12px;">Limpar Dados</button>
 
 <div id="videoContainer" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 9999; display: none;">
-    <video id="cutsceneVideo" src="./cust_scene_getting_out.mp4" style="width: 100%; height: 100%; object-fit: contain;"></video>
+    <video id="cutsceneVideo" src="./cust_scene_getting_out.mp4" style="width: 100%; height: 100%; object-fit: contain;"></video>
 </div>
 <script>
 // ========================
@@ -265,6 +350,18 @@ function gerarItens() {
 const itens = [];
 const nomes = ['Espada', 'Adaga', 'Lança', 'Escudo', 'Amuleto', 'Armadura', 'Elmo', 'Broquel', 'Cajado', 'Chicote', 'Disco', 'Cetro', 'Garras', 'Foice', 'Martelo'];
 const elems = ['Fogo', 'Água', 'Terra', 'Vento', 'Luz', 'Trevas', 'Veneno', 'Impacto', 'Raio', 'Neutro', 'Sagrado'];
+
+// Adiciona a Poção de Cura como primeiro item
+const pocaoCura = {
+    id: 'pocao_cura',
+    nome: 'Poção de Cura',
+    preco: 50,
+    tipo: 'consum',
+    isEquipavel: false,
+    heal: 100
+};
+itens.push(pocaoCura);
+
 for(let i=1; i<=1000; i++){
 const tipoRand = Math.random();
 let preco;
@@ -366,7 +463,7 @@ let inimigoAtual = null;
 // Lista de inimigos e chefes
 const ENEMIES = [
 { nome:'Esqueleto', hp:50, atk:8, def:2, icon:'💀', gold:[10,20], drops:[['Poção de Cura',0.3]] },
-{ nome:'Múmia', hp:80, atk:12, def:4, icon:'🤕', gold:[20,50], drops:[['Poção de Cura',0.4]] },
+{ nome:'Múmia', hp:80, atk:12, def:4, icon:'💀', gold:[20,50], drops:[['Poção de Cura',0.4]] },
 { nome:'Faraó Fantasma', hp:120, atk:20, def:6, icon:'👻', gold:[50,100], drops:[['Poção de Cura',0.5]] }
 ];
 
@@ -388,6 +485,120 @@ ENEMIES.push({ nome:nomeAleatorio, hp:hpBase, atk:atkBase, def:defBase, icon:'�
 }
 
 // ========================
+// Sistema de Pesquisa
+// ========================
+
+function pesquisarItens(termo) {
+    const resultadosDiv = document.getElementById('searchResults');
+    resultadosDiv.innerHTML = '';
+    
+    if (termo.length < 2) {
+        resultadosDiv.style.display = 'none';
+        return;
+    }
+    
+    const termoLower = termo.toLowerCase();
+    const resultados = ITEMS.filter(item => 
+        item.nome.toLowerCase().includes(termoLower) || 
+        item.tipo.toLowerCase().includes(termoLower) ||
+        (item.elem && item.elem.toLowerCase().includes(termoLower))
+    ).slice(0, 10); // Limita a 10 resultados
+    
+    if (resultados.length === 0) {
+        resultadosDiv.innerHTML = '<div class="search-result-item">Nenhum item encontrado</div>';
+    } else {
+        resultados.forEach(item => {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'search-result-item';
+            itemDiv.innerHTML = `
+                <div class="search-result-name">${item.nome} (${item.tipo})</div>
+                <div class="search-result-stats">${formatarStatsResumo(item)} | Preço: PO ${item.preco.toLocaleString()}</div>
+            `;
+            itemDiv.onclick = () => {
+                document.getElementById('searchInput').value = item.nome;
+                resultadosDiv.style.display = 'none';
+                // Foca no item na loja (opcional)
+                focarNoItem(item.id);
+            };
+            resultadosDiv.appendChild(itemDiv);
+        });
+    }
+    
+    resultadosDiv.style.display = 'block';
+}
+
+function formatarStatsResumo(item) {
+    const stats = [];
+    if (item.min && item.max) stats.push(`ATK:${item.min}-${item.max}`);
+    if (item.crit) stats.push(`CRIT:+${item.crit}%`);
+    if (item.def) stats.push(`DEF:+${item.def}`);
+    if (item.bloco) stats.push(`BLOCO:${item.bloco}%`);
+    if (item.elem) stats.push(item.elem);
+    if (item.bonusHP) stats.push(`HP:+${item.bonusHP}`);
+    if (item.bonusMP) stats.push(`MP:+${item.bonusMP}`);
+    if (item.bonusATK) stats.push(`ATK:+${item.bonusATK}`);
+    if (item.bonusCRIT) stats.push(`CRIT:+${item.bonusCRIT}%`);
+    if (item.heal) stats.push(`CURA:${item.heal}`);
+    
+    return stats.join(' ');
+}
+
+function focarNoItem(itemId) {
+    // Encontra a página onde está o item
+    const itemIndex = itensOrdenados.findIndex(item => item.id === itemId);
+    if (itemIndex !== -1) {
+        const novaPagina = Math.floor(itemIndex / ITENS_POR_PAGINA) + 1;
+        paginaAtual = novaPagina;
+        mostrarItens();
+        
+        // Destaca o item (opcional)
+        setTimeout(() => {
+            const itemElement = document.querySelector(`[onclick="comprarItem('${itemId}')"]`);
+            if (itemElement) {
+                itemElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                itemElement.parentElement.style.backgroundColor = 'var(--accent)';
+                itemElement.parentElement.style.color = 'var(--bg)';
+                setTimeout(() => {
+                    itemElement.parentElement.style.backgroundColor = '';
+                    itemElement.parentElement.style.color = '';
+                }, 2000);
+            }
+        }, 100);
+    }
+}
+
+// Event Listeners para o sistema de pesquisa
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const searchResults = document.getElementById('searchResults');
+    
+    searchInput.addEventListener('input', function(e) {
+        pesquisarItens(e.target.value);
+    });
+    
+    searchInput.addEventListener('focus', function() {
+        if (searchInput.value.length >= 2) {
+            pesquisarItens(searchInput.value);
+        }
+    });
+    
+    // Fecha os resultados ao clicar fora
+    document.addEventListener('click', function(e) {
+        if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+            searchResults.style.display = 'none';
+        }
+    });
+    
+    // Tecla ESC fecha os resultados
+    searchInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            searchResults.style.display = 'none';
+            searchInput.blur();
+        }
+    });
+});
+
+// ========================
 // Funções para salvar e carregar
 function salvarNoLocalStorage() {
 localStorage.setItem('gameState', JSON.stringify(heroi));
@@ -399,12 +610,6 @@ const p = JSON.parse(data);
 Object.assign(heroi, p);
 recalcularStatus(); // Recalcula status baseados nos equipamentos carregados
 }
-}
-
-// Função para limpar todos os dados do jogo
-function limparDados() {
-localStorage.clear();
-location.reload();
 }
 
 // ========================
@@ -523,10 +728,41 @@ function atualizarInventario() {
             <div><b>${i.nome}</b> x${i.quantidade} ${statsHtml}</div>`;
         if (i.isEquipavel) {
             itemHtml += ` <button class="buttonnn" style="background: #d4a761; font-size: 12px; padding: 2px 6px;" onclick="equiparItemDoInventario('${i.id}')">Equipar</button>`;
+        } else if (i.tipo === 'consum' && i.heal) {
+            itemHtml += ` <button class="buttonnn" style="background: #a3bf3f; font-size: 12px; padding: 2px 6px;" onclick="usarPocaoEspecifica('${i.id}')">Usar</button>`;
         }
         itemHtml += `</div>`;
         div.innerHTML += itemHtml;
     });
+}
+
+// Usar Poção Específica do Inventário
+function usarPocaoEspecifica(id) {
+    const pocaoIndex = heroi.inventory.findIndex(i => i.id === id && i.tipo === 'consum' && i.heal);
+    if(pocaoIndex === -1){
+        alert('Poção não encontrada no inventário.');
+        return;
+    }
+    
+    const pocao = heroi.inventory[pocaoIndex];
+    
+    // Verifica se o HP já está no máximo
+    if(heroi.hp >= heroi.maxHp){
+        alert('Seu HP já está no máximo!');
+        return;
+    }
+    
+    // Aplica a cura
+    heroi.hp = Math.min(heroi.maxHp, heroi.hp + pocao.heal);
+    
+    // Remove uma unidade da poção
+    pocao.quantidade--;
+    if(pocao.quantidade <= 0){
+        heroi.inventory.splice(pocaoIndex, 1);
+    }
+    
+    alert(`Você usou uma ${pocao.nome} e recuperou ${pocao.heal} HP. HP atual: ${heroi.hp}/${heroi.maxHp}`);
+    atualizarStatus();
 }
 
 // Equipar itens do inventário
@@ -561,25 +797,34 @@ recalcularStatus();
 atualizarStatus();
 }
 
-// Usar Poção
+// Usar Poção (função original - usa qualquer poção disponível)
 function usarPocao() {
 const pocaoIndex = heroi.inventory.findIndex(i => i.nome.includes('Poção') && i.tipo === 'consum');
 if(pocaoIndex === -1){
 alert('Você não tem poções de HP no inventário.');
 return;
 }
+
 const pocao = heroi.inventory[pocaoIndex];
-heroi.hp = heroi.maxHp;
+
+// Verifica se o HP já está no máximo
+if(heroi.hp >= heroi.maxHp){
+    alert('Seu HP já está no máximo!');
+    return;
+}
+
+// Aplica a cura
+heroi.hp = Math.min(heroi.maxHp, heroi.hp + pocao.heal);
 pocao.quantidade--;
 if(pocao.quantidade <= 0){
 heroi.inventory.splice(pocaoIndex, 1);
 }
-alert(`Você usou uma poção e recuperou todo o seu HP.`);
+alert(`Você usou uma poção e recuperou ${pocao.heal} HP. HP atual: ${heroi.hp}/${heroi.maxHp}`);
 atualizarStatus();
 }
 
 // ========================
-// Sistema de luta (mantido)
+// Sistema de luta (ATUALIZADO - não perde status/inventário ao morrer)
 // ========================
 
 function encontrarInimigo() {
@@ -604,35 +849,35 @@ document.getElementById('btnSair').disabled = false; // Habilita o Sair
 
 // Função para sair do combate (ATUALIZADA)
 function sairDoCombate() {
-    if (!inimigoAtual) return;
+    if (!inimigoAtual) return;
 
-    // 1. Oculta a interface do jogo (opcional, mas bom para focar no vídeo)
-    document.querySelector('.container').style.display = 'none';
-    document.getElementById('lutaSistema').style.display = 'none';
+    // 1. Oculta a interface do jogo (opcional, mas bom para focar no vídeo)
+    document.querySelector('.container').style.display = 'none';
+    document.getElementById('lutaSistema').style.display = 'none';
 
-    // 2. Prepara e exibe o container do vídeo
-    const videoContainer = document.getElementById('videoContainer');
-    const cutsceneVideo = document.getElementById('cutsceneVideo');
+    // 2. Prepara e exibe o container do vídeo
+    const videoContainer = document.getElementById('videoContainer');
+    const cutsceneVideo = document.getElementById('cutsceneVideo');
 
-    videoContainer.style.display = 'block';
+    videoContainer.style.display = 'block';
 
-    // 3. Define a ação ao finalizar o vídeo
-    cutsceneVideo.onended = function() {
-        // Tenta fechar a aba/janela (na maioria dos navegadores só funciona se for aberta pelo script)
-        window.close();
-        
-        // Ou, uma alternativa mais confiável: reseta o jogo (simulando o "fechamento" para a página inicial)
-        alert('O jogo será reiniciado. Fim da cutscene!');
-        location.reload(); 
-    };
+    // 3. Define a ação ao finalizar o vídeo
+    cutsceneVideo.onended = function() {
+        // Tenta fechar a aba/janela (na maioria dos navegadores só funciona se for aberta pelo script)
+        window.close();
+        
+        // Ou, uma alternativa mais confiável: reseta o jogo (simulando o "fechamento" para a página inicial)
+        alert('O jogo será reiniciado. Fim da cutscene!');
+        location.reload(); 
+    };
 
-    // 4. Inicia a reprodução
-    // Nota: Navegadores modernos podem bloquear a reprodução automática.
-    cutsceneVideo.play().catch(error => {
-        // Caso o play seja bloqueado (comum em navegadores):
-        alert('Falha ao iniciar a cutscene. Clique em OK para reiniciar o jogo.');
-        location.reload();
-    });
+    // 4. Inicia a reprodução
+    // Nota: Navegadores modernos podem bloquear a reprodução automática.
+    cutsceneVideo.play().catch(error => {
+        // Caso o play seja bloqueado (comum em navegadores):
+        alert('Falha ao iniciar a cutscene. Clique em OK para reiniciar o jogo.');
+        location.reload();
+    });
 }
 
 
@@ -706,13 +951,17 @@ heroi.hp -= danoInimigo;
 if(heroi.hp<0) heroi.hp=0;
 alert(`${inimigoAtual.nome} causou ${danoInimigo} de dano em você!`);
 if(heroi.hp<=0){
-alert('Você morreu! O personagem foi resetado.');
-resetHerói();
+// ALTERAÇÃO AQUI: Ao morrer, apenas recupera HP/MP sem perder status, inventário ou equipamentos
+alert('Você foi derrotado! Recuperando HP e MP...');
+heroi.hp = heroi.maxHp;
+heroi.mp = heroi.maxMp;
+// Não chama resetHerói() - mantém todo o progresso
 }
 atualizarStatus();
 salvarNoLocalStorage(); // salva após ataque
 }
 
+// Função resetHerói mantida para outros usos, mas não é mais chamada ao morrer
 function resetHerói() {
 heroi.hp=heroi.maxHp;
 heroi.mp=heroi.maxMp;
