@@ -121,6 +121,306 @@ html, body { height: 100%; margin: 0; font-family: Roboto, system-ui, -apple-sys
     color: var(--bg);
 }
 
+/* --- Estilos para o Sistema de Backup --- */
+.backup-section {
+    border-top: 1px solid #323025;
+    margin-top: 12px;
+    padding-top: 12px;
+}
+
+.backup-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.backup-btn {
+    padding: 8px 12px;
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s;
+}
+
+.backup-btn:hover {
+    background: var(--accent2);
+    transform: translateY(-1px);
+}
+
+.backup-btn.delete {
+    background: var(--danger);
+    font-size: 12px;
+    padding: 4px 8px;
+}
+
+.backup-btn.delete:hover {
+    background: #9a5530;
+}
+
+.backup-btn.danger {
+    background: var(--danger);
+    color: white;
+}
+
+.backup-btn.danger:hover {
+    background: #9a5530;
+}
+
+.backup-list {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #323025;
+    border-radius: 6px;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.backup-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 8px;
+    margin-bottom: 6px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    border-left: 3px solid var(--accent);
+}
+
+.backup-item:last-child {
+    margin-bottom: 0;
+}
+
+.backup-item-info {
+    flex: 1;
+}
+
+.backup-item-name {
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.backup-item-details {
+    font-size: 11px;
+    color: var(--muted);
+    display: flex;
+    gap: 10px;
+}
+
+.backup-item-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.backup-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s;
+}
+
+.backup-modal.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.backup-modal-content {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 20px;
+    width: 90%;
+    max-width: 400px;
+    border: 2px solid var(--accent);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.backup-modal h3 {
+    margin-top: 0;
+    color: var(--accent);
+}
+
+.backup-input {
+    width: 100%;
+    padding: 10px;
+    background: var(--bg);
+    border: 2px solid var(--accent);
+    border-radius: 6px;
+    color: var(--text);
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+.backup-input:focus {
+    outline: none;
+    border-color: var(--accent2);
+}
+
+.backup-modal-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.backup-confirm-btn {
+    padding: 8px 16px;
+    background: var(--ok);
+    color: var(--bg);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.backup-cancel-btn {
+    padding: 8px 16px;
+    background: var(--danger);
+    color: var(--bg);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.backup-warning-btn {
+    padding: 8px 16px;
+    background: var(--danger);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.backup-confirm-btn:hover {
+    background: #8aaf36;
+}
+
+.backup-cancel-btn:hover {
+    background: #9a5530;
+}
+
+.backup-warning-btn:hover {
+    background: #9a5530;
+}
+
+/* --- Modal de Confirmação de Recomeço --- */
+.confirm-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 3000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s;
+}
+
+.confirm-modal.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.confirm-modal-content {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 25px;
+    width: 90%;
+    max-width: 450px;
+    border: 2px solid var(--danger);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+    text-align: center;
+}
+
+.confirm-icon {
+    font-size: 48px;
+    color: var(--danger);
+    margin-bottom: 15px;
+}
+
+.confirm-modal h3 {
+    margin-top: 0;
+    color: var(--danger);
+    font-size: 22px;
+}
+
+.confirm-message {
+    margin: 15px 0;
+    color: var(--text);
+    line-height: 1.5;
+}
+
+.confirm-details {
+    background: rgba(191, 109, 63, 0.1);
+    padding: 10px;
+    border-radius: 6px;
+    margin: 15px 0;
+    border-left: 3px solid var(--danger);
+}
+
+.confirm-details p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+.confirm-modal-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.confirm-cancel-btn {
+    padding: 10px 20px;
+    background: var(--muted);
+    color: var(--bg);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    flex: 1;
+}
+
+.confirm-proceed-btn {
+    padding: 10px 20px;
+    background: var(--danger);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    flex: 1;
+}
+
+.confirm-cancel-btn:hover {
+    background: #6a6a5c;
+}
+
+.confirm-proceed-btn:hover {
+    background: #9a5530;
+}
+
+.warning-text {
+    color: var(--danger);
+    font-weight: bold;
+}
+
 /* --- Início do Código Responsivo (Tema Egípcio) --- */
 @media (max-width: 900px) {
 :root {
@@ -247,6 +547,46 @@ body {
     margin-left: 0;
     margin-bottom: 10px;
 }
+
+/* Ajustes para backup em mobile */
+.backup-controls {
+    flex-direction: column;
+}
+
+.backup-btn {
+    width: 100%;
+}
+
+.backup-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.backup-item-actions {
+    width: 100%;
+    justify-content: flex-end;
+}
+
+.backup-modal-content {
+    width: 95%;
+    padding: 15px;
+}
+
+.confirm-modal-content {
+    width: 95%;
+    padding: 20px;
+}
+
+.confirm-modal-buttons {
+    flex-direction: column;
+    gap: 10px;
+}
+
+.confirm-cancel-btn,
+.confirm-proceed-btn {
+    width: 100%;
+}
 }
 /* --- Fim do Código Responsivo --- */
 </style>
@@ -286,6 +626,21 @@ body {
 <span class="pill">DEF <b id="defVal">5</b></span>
 <span class="pill">CRIT <b id="critVal">3%</b></span>
 <span class="pill">OURO <b id="goldVal">0</b></span>
+</div>
+
+<!-- Seção de Backup -->
+<div class="backup-section">
+    <h3>💾 Sistema de Backup</h3>
+    <div class="backup-controls">
+        <button class="backup-btn" onclick="criarBackup()">Criar Backup</button>
+        <button class="backup-btn" onclick="exportarBackup()">Exportar Backup</button>
+        <button class="backup-btn" onclick="importarBackup()">Importar Backup</button>
+        <button class="backup-btn danger" onclick="mostrarConfirmacaoRecomecar()">Recomeçar Jogo</button>
+    </div>
+    
+    <div class="backup-list" id="backupList">
+        <!-- Lista de backups será carregada aqui -->
+    </div>
 </div>
 
 <div class="section">
@@ -343,7 +698,417 @@ body {
 <div id="videoContainer" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 9999; display: none;">
     <video id="cutsceneVideo" src="./cust_scene_getting_out.mp4" style="width: 100%; height: 100%; object-fit: contain;"></video>
 </div>
+
+<!-- Modal para criar/importar backup -->
+<div class="backup-modal" id="backupModal">
+    <div class="backup-modal-content">
+        <h3 id="backupModalTitle">Criar Backup</h3>
+        <input type="text" id="backupNameInput" class="backup-input" placeholder="Nome do backup (opcional)" maxlength="30">
+        <div class="backup-modal-buttons">
+            <button id="backupConfirmBtn" class="backup-confirm-btn">Confirmar</button>
+            <button onclick="fecharModalBackup()" class="backup-cancel-btn">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmação para recomeçar -->
+<div class="confirm-modal" id="confirmRecomecarModal">
+    <div class="confirm-modal-content">
+        <div class="confirm-icon">⚠️</div>
+        <h3>CONFIRMAR RECOMEÇO</h3>
+        <div class="confirm-message">
+            <p>Você está prestes a <span class="warning-text">recomeçar o jogo completamente</span>.</p>
+            <p>Todos os seus dados atuais serão <span class="warning-text">perdidos permanentemente</span>.</p>
+        </div>
+        
+        <div class="confirm-details">
+            <p><strong>O que será perdido:</strong></p>
+            <p>• Nível atual: <span id="confirmNivel">1</span></p>
+            <p>• Ouro: <span id="confirmOuro">0</span></p>
+            <p>• Itens no inventário: <span id="confirmItens">0</span></p>
+            <p>• Equipamentos: <span id="confirmEquips">0</span></p>
+            <p>• XP acumulada: <span id="confirmXP">0</span></p>
+        </div>
+        
+        <div class="confirm-message">
+            <p><strong>Recomendação:</strong> Crie um backup antes de recomeçar!</p>
+        </div>
+        
+        <div class="confirm-modal-buttons">
+            <button onclick="fecharConfirmacaoRecomecar()" class="confirm-cancel-btn">Cancelar</button>
+            <button onclick="confirmarRecomecar()" class="confirm-proceed-btn">Sim, Recomeçar Agora</button>
+        </div>
+    </div>
+</div>
+
 <script>
+// ========================
+// Sistema de Backup
+// ========================
+
+let backups = [];
+const MAX_BACKUPS = 10;
+
+// Inicializar sistema de backup
+function inicializarBackup() {
+    const savedBackups = localStorage.getItem('gameBackups');
+    if (savedBackups) {
+        backups = JSON.parse(savedBackups);
+        atualizarListaBackups();
+    }
+}
+
+// Criar um novo backup
+function criarBackup() {
+    if (backups.length >= MAX_BACKUPS) {
+        alert(`Limite de ${MAX_BACKUPS} backups atingido. Exclua um backup antigo para criar um novo.`);
+        return;
+    }
+    
+    abrirModalBackup('criar');
+}
+
+// Abrir modal de backup
+function abrirModalBackup(tipo) {
+    const modal = document.getElementById('backupModal');
+    const title = document.getElementById('backupModalTitle');
+    const input = document.getElementById('backupNameInput');
+    const confirmBtn = document.getElementById('backupConfirmBtn');
+    
+    if (tipo === 'criar') {
+        title.textContent = 'Criar Backup';
+        input.placeholder = 'Nome do backup (opcional)';
+        input.value = '';
+        confirmBtn.onclick = confirmarCriarBackup;
+    } else if (tipo === 'importar') {
+        title.textContent = 'Importar Backup';
+        input.placeholder = 'Cole o código do backup aqui';
+        input.value = '';
+        confirmBtn.onclick = confirmarImportarBackup;
+    }
+    
+    modal.classList.add('active');
+    input.focus();
+}
+
+// Fechar modal de backup
+function fecharModalBackup() {
+    document.getElementById('backupModal').classList.remove('active');
+}
+
+// Confirmar criação de backup
+function confirmarCriarBackup() {
+    const nome = document.getElementById('backupNameInput').value.trim();
+    const timestamp = new Date().toLocaleString('pt-BR');
+    
+    const backupData = {
+        id: Date.now(),
+        nome: nome || `Backup ${backups.length + 1}`,
+        data: timestamp,
+        heroi: JSON.parse(JSON.stringify(heroi)), // Deep clone do herói
+        version: '1.0'
+    };
+    
+    backups.unshift(backupData); // Adiciona no início
+    
+    if (backups.length > MAX_BACKUPS) {
+        backups = backups.slice(0, MAX_BACKUPS); // Mantém apenas os mais recentes
+    }
+    
+    salvarBackups();
+    atualizarListaBackups();
+    fecharModalBackup();
+    
+    mostrarNotificacao(`Backup "${backupData.nome}" criado com sucesso!`);
+}
+
+// Restaurar backup
+function restaurarBackup(backupId) {
+    if (!confirm('Tem certeza que deseja restaurar este backup? O progresso atual será perdido.')) {
+        return;
+    }
+    
+    const backup = backups.find(b => b.id === backupId);
+    if (!backup) return;
+    
+    // Restaura o estado do herói
+    Object.assign(heroi, backup.heroi);
+    recalcularStatus();
+    atualizarStatus();
+    atualizarInventario();
+    
+    mostrarNotificacao(`Backup "${backup.nome}" restaurado com sucesso!`);
+}
+
+// Excluir backup
+function excluirBackup(backupId) {
+    if (!confirm('Tem certeza que deseja excluir este backup?')) {
+        return;
+    }
+    
+    backups = backups.filter(b => b.id !== backupId);
+    salvarBackups();
+    atualizarListaBackups();
+    
+    mostrarNotificacao('Backup excluído com sucesso!');
+}
+
+// Exportar backup como texto
+function exportarBackup() {
+    const backupParaExportar = {
+        nome: `Backup_${new Date().toISOString().slice(0, 10)}`,
+        data: new Date().toLocaleString('pt-BR'),
+        heroi: heroi,
+        version: '1.0'
+    };
+    
+    const backupString = JSON.stringify(backupParaExportar, null, 2);
+    const blob = new Blob([backupString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `battle_backup_${Date.now()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    mostrarNotificacao('Backup exportado com sucesso!');
+}
+
+// Importar backup
+function importarBackup() {
+    abrirModalBackup('importar');
+}
+
+// Confirmar importação de backup
+function confirmarImportarBackup() {
+    const input = document.getElementById('backupNameInput');
+    const backupString = input.value.trim();
+    
+    if (!backupString) {
+        alert('Por favor, cole o código do backup.');
+        return;
+    }
+    
+    try {
+        const backupData = JSON.parse(backupString);
+        
+        // Validação básica do backup
+        if (!backupData.heroi || !backupData.heroi.nome) {
+            throw new Error('Formato de backup inválido.');
+        }
+        
+        if (backups.length >= MAX_BACKUPS) {
+            alert(`Limite de ${MAX_BACKUPS} backups atingido. Exclua um backup antigo primeiro.`);
+            return;
+        }
+        
+        backupData.id = Date.now();
+        if (!backupData.data) {
+            backupData.data = new Date().toLocaleString('pt-BR');
+        }
+        if (!backupData.nome) {
+            backupData.nome = 'Backup Importado';
+        }
+        
+        backups.unshift(backupData);
+        
+        if (backups.length > MAX_BACKUPS) {
+            backups = backups.slice(0, MAX_BACKUPS);
+        }
+        
+        salvarBackups();
+        atualizarListaBackups();
+        fecharModalBackup();
+        
+        mostrarNotificacao(`Backup "${backupData.nome}" importado com sucesso!`);
+        
+    } catch (error) {
+        alert('Erro ao importar backup. Verifique se o código está correto.');
+        console.error(error);
+    }
+}
+
+// Atualizar lista de backups na UI
+function atualizarListaBackups() {
+    const backupList = document.getElementById('backupList');
+    backupList.innerHTML = '';
+    
+    if (backups.length === 0) {
+        backupList.innerHTML = '<div style="text-align: center; color: var(--muted); padding: 20px;">Nenhum backup criado ainda</div>';
+        return;
+    }
+    
+    backups.forEach(backup => {
+        const backupItem = document.createElement('div');
+        backupItem.className = 'backup-item';
+        
+        backupItem.innerHTML = `
+            <div class="backup-item-info">
+                <div class="backup-item-name">${backup.nome}</div>
+                <div class="backup-item-details">
+                    <span>Nv ${backup.heroi.lv}</span>
+                    <span>${backup.heroi.gold} ouro</span>
+                    <span>${backup.data}</span>
+                </div>
+            </div>
+            <div class="backup-item-actions">
+                <button class="backup-btn" onclick="restaurarBackup(${backup.id})">Restaurar</button>
+                <button class="backup-btn delete" onclick="excluirBackup(${backup.id})">Excluir</button>
+            </div>
+        `;
+        
+        backupList.appendChild(backupItem);
+    });
+}
+
+// Salvar backups no localStorage
+function salvarBackups() {
+    localStorage.setItem('gameBackups', JSON.stringify(backups));
+}
+
+// ========================
+// Sistema de Recomeço
+// ========================
+
+// Mostrar modal de confirmação para recomeçar
+function mostrarConfirmacaoRecomecar() {
+    const modal = document.getElementById('confirmRecomecarModal');
+    
+    // Preencher dados atuais para confirmação
+    document.getElementById('confirmNivel').textContent = heroi.lv;
+    document.getElementById('confirmOuro').textContent = heroi.gold.toLocaleString();
+    document.getElementById('confirmItens').textContent = heroi.inventory.reduce((total, item) => total + (item.quantidade || 1), 0);
+    document.getElementById('confirmEquips').textContent = 
+        (heroi.equipWeapon ? 1 : 0) + 
+        (heroi.equipOffhand ? 1 : 0) + 
+        (heroi.equipAmulet ? 1 : 0);
+    document.getElementById('confirmXP').textContent = heroi.xp;
+    
+    modal.classList.add('active');
+}
+
+// Fechar modal de confirmação
+function fecharConfirmacaoRecomecar() {
+    document.getElementById('confirmRecomecarModal').classList.remove('active');
+}
+
+// Confirmar e executar o recomeço
+function confirmarRecomecar() {
+    // Fechar modal
+    fecharConfirmacaoRecomecar();
+    
+    // Mostrar mensagem final
+    alert('Reiniciando o jogo... Tudo será resetado para os valores iniciais.');
+    
+    // Executar o reset completo
+    recomecarJogoCompleto();
+}
+
+// Função principal para recomeçar o jogo
+function recomecarJogoCompleto() {
+    // Criar um último backup automático antes de recomeçar (opcional)
+    const timestamp = new Date().toLocaleString('pt-BR');
+    const backupFinal = {
+        id: Date.now(),
+        nome: `Último backup antes do recomeço`,
+        data: timestamp,
+        heroi: JSON.parse(JSON.stringify(heroi)), // Salva estado atual
+        version: '1.0'
+    };
+    
+    // Adicionar ao início dos backups
+    backups.unshift(backupFinal);
+    if (backups.length > MAX_BACKUPS) {
+        backups = backups.slice(0, MAX_BACKUPS);
+    }
+    salvarBackups();
+    
+    // ========================
+    // RESET COMPLETO DO HERÓI
+    // ========================
+    
+    // Resetar todos os atributos do herói para valores iniciais
+    heroi.lv = 1;
+    heroi.hp = 100;
+    heroi.maxHp = 100;
+    heroi.mp = 30;
+    heroi.maxMp = 30;
+    heroi.xp = 0;
+    heroi.gold = 0;
+    heroi.atk = 10;
+    heroi.def = 5;
+    heroi.crit = 3;
+    heroi.elem = 'Neutro';
+    
+    // Limpar inventário completamente
+    heroi.inventory = [];
+    
+    // Remover todos os equipamentos
+    heroi.equipWeapon = null;
+    heroi.equipOffhand = null;
+    heroi.equipAmulet = null;
+    
+    // Adicionar itens iniciais novamente
+    const itemInicialArma = { 
+        id:'arma_inicial', 
+        nome:'Espada de Treino', 
+        preco:0, 
+        tipo:'arma', 
+        isEquipavel:true, 
+        min:5, 
+        max:10, 
+        crit:2, 
+        vel:1.0, 
+        elem:'Neutro' 
+    };
+    
+    const itemInicialPocao = { 
+        id:'pocao_inicial', 
+        nome:'Poção de Cura', 
+        preco:0, 
+        tipo:'consum', 
+        isEquipavel:false, 
+        heal: 100 
+    };
+    
+    heroi.inventory.push({ ...itemInicialArma, quantidade: 1 });
+    heroi.inventory.push({ ...itemInicialPocao, quantidade: 1 });
+    
+    // Equipar a arma inicial automaticamente
+    heroi.equipWeapon = itemInicialArma;
+    
+    // Resetar inimigo atual se houver
+    inimigoAtual = null;
+    document.getElementById('enemyIcon').textContent='?';
+    document.getElementById('enemyNome').textContent='Nenhum inimigo';
+    document.getElementById('enemyHP').textContent='0/0';
+    document.getElementById('enemyMaxHP').textContent='0';
+    document.getElementById('btnAtacar').disabled=true;
+    document.getElementById('btnSair').disabled = true;
+    
+    // Recalcular status
+    recalcularStatus();
+    
+    // Atualizar interface
+    atualizarStatus();
+    atualizarInventario();
+    atualizarListaBackups();
+    
+    // Salvar estado resetado
+    salvarNoLocalStorage();
+    
+    // Mostrar notificação de sucesso
+    mostrarNotificacao('Jogo recomeçado com sucesso! Status resetados para os valores iniciais.');
+    
+    // Mostrar mensagem adicional
+    setTimeout(() => {
+        alert('✅ Jogo recomeçado!\n\n• Nível: 1\n• HP/MP: Máximos\n• Inventário: Resetado\n• Equipamentos: Apenas espada inicial\n• Ouro: 0\n\nBoa sorte na nova jornada!');
+    }, 500);
+}
+
 // ========================
 // Geração de itens
 function gerarItens() {
@@ -453,7 +1218,7 @@ equipOffhand:null,
 equipAmulet:null
 };
 
-// Itens iniciais
+// Itens iniciais (definidos novamente para uso no recomeço)
 const itemInicialArma = { id:'arma_inicial', nome:'Espada de Treino', preco:0, tipo:'arma', isEquipavel:true, min:5, max:10, crit:2, vel:1.0, elem:'Neutro' };
 const itemInicialPocao = { id:'pocao_inicial', nome:'Poção de Cura', preco:0, tipo:'consum', isEquipavel:false, heal: 100 };
 
@@ -594,6 +1359,32 @@ document.addEventListener('DOMContentLoaded', function() {
         if (e.key === 'Escape') {
             searchResults.style.display = 'none';
             searchInput.blur();
+        }
+    });
+    
+    // Inicializar sistema de backup
+    inicializarBackup();
+    
+    // Fechar modais ao clicar fora
+    const backupModal = document.getElementById('backupModal');
+    backupModal.addEventListener('click', function(e) {
+        if (e.target === backupModal) {
+            fecharModalBackup();
+        }
+    });
+    
+    const confirmModal = document.getElementById('confirmRecomecarModal');
+    confirmModal.addEventListener('click', function(e) {
+        if (e.target === confirmModal) {
+            fecharConfirmacaoRecomecar();
+        }
+    });
+    
+    // Tecla ESC fecha os modais
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            fecharModalBackup();
+            fecharConfirmacaoRecomecar();
         }
     });
 });
