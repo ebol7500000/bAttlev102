@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>bAttle text-based game</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="icon" type="image/png" href="./theme_ico.png">
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet" />
 
 <style>
@@ -877,7 +876,7 @@ function exportarBackup() {
     mostrarNotificacao('Backup exportado com sucesso!');
 }
 
-// Importar backup - CORREÇÃO AQUI
+// Importar backup
 function importarBackup() {
     // Cria um input de arquivo oculto
     const fileInput = document.createElement('input');
@@ -1393,6 +1392,147 @@ function focarNoItem(itemId) {
     }
 }
 
+// ========================
+// Função para desequipar itens
+// ========================
+
+function desequiparItem(slot) {
+    let itemRemovido = null;
+    
+    if (slot === 'weapon' && heroi.equipWeapon) {
+        itemRemovido = heroi.equipWeapon;
+        heroi.equipWeapon = null;
+    } else if (slot === 'offhand' && heroi.equipOffhand) {
+        itemRemovido = heroi.equipOffhand;
+        heroi.equipOffhand = null;
+    } else if (slot === 'amulet' && heroi.equipAmulet) {
+        itemRemovido = heroi.equipAmulet;
+        heroi.equipAmulet = null;
+    }
+    
+    if (itemRemovido) {
+        // Adiciona de volta ao inventário
+        let itemExistente = heroi.inventory.find(i => i.id === itemRemovido.id);
+        if (itemExistente) {
+            itemExistente.quantidade = (itemExistente.quantidade || 1) + 1;
+        } else {
+            heroi.inventory.push({ ...itemRemovido, quantidade: 1 });
+        }
+        
+        alert(`Você desequipou ${itemRemovido.nome}.`);
+        recalcularStatus();
+        atualizarInventario();
+        atualizarStatus();
+    }
+}
+
+// ========================
+// CORREÇÃO: Sistema de luta (função atacar corrigida)
+// ========================
+
+function atacar() {
+    if(!inimigoAtual) return;
+    
+    // Cálculo do dano base da arma
+    let danoBase = 0;
+    if (heroi.equipWeapon) {
+        danoBase = Math.floor(Math.random() * (heroi.equipWeapon.max - heroi.equipWeapon.min + 1)) + heroi.equipWeapon.min;
+    } else {
+        danoBase = Math.floor(heroi.atk * (1 + Math.random() * 0.5)); // Dano base sem arma
+    }
+    
+    // Verificar crítico
+    const chanceCrit = heroi.crit / 100;
+    const isCritico = Math.random() < chanceCrit;
+    let multiplicadorCrit = 1;
+    
+    if (isCritico) {
+        multiplicadorCrit = 2; // Dano 2x em crítico
+        mostrarNotificacao("🎯 CRÍTICO!");
+    }
+    
+    // Cálculo do dano final (defesa do inimigo reduz o dano)
+    let danoHeroi = Math.max(1, Math.floor(danoBase * multiplicadorCrit) - (inimigoAtual.def || 0));
+    
+    // Aplicar dano
+    inimigoAtual.hp -= danoHeroi;
+    if(inimigoAtual.hp < 0) inimigoAtual.hp = 0;
+    
+    // Atualiza o HP do inimigo
+    document.getElementById('enemyHP').textContent = `${inimigoAtual.hp}/${inimigoAtual.hpMax}`;
+    
+    let mensagemDano = `Você causou ${danoHeroi} de dano`;
+    if (isCritico) mensagemDano += " (CRÍTICO!)";
+    alert(mensagemDano);
+
+    if(inimigoAtual.hp <= 0){
+        alert(`Inimigo ${inimigoAtual.nome} derrotado!`);
+        const ouroGanhos = Math.floor(Math.random()*(inimigoAtual.gold[1]-inimigoAtual.gold[0]+1))+inimigoAtual.gold[0];
+        heroi.gold += ouroGanhos;
+        const xpGanhos = 10+Math.floor(Math.random()*10);
+        heroi.xp += xpGanhos;
+        alert(`Ganhou ${ouroGanhos} ouro e ${xpGanhos} XP!`);
+
+        // Drop de item raro
+        if (inimigoAtual.drops && inimigoAtual.drops.length > 0) {
+            for(const [itemName, dropChance] of inimigoAtual.drops){
+                if (Math.random() < dropChance) {
+                    const itemDrop = ITEMS.find(i => i.nome === itemName);
+                    if (itemDrop) {
+                        let invItem = heroi.inventory.find(i=>i.id===itemDrop.id);
+                        if(invItem){
+                            invItem.quantidade = (invItem.quantidade || 1) + 1;
+                        } else {
+                            heroi.inventory.push({ ...itemDrop, quantidade:1 });
+                        }
+                        mostrarNotificacao(`Você recebeu um item raro: ${itemDrop.nome}!`);
+                    }
+                }
+            }
+        }
+
+        // Subir de nível
+        const xpNecessaria = heroi.lv * 50;
+        if(heroi.xp >= xpNecessaria) {
+            heroi.lv++;
+            heroi.xp -= xpNecessaria;
+            heroi.maxHp += 10;
+            heroi.hp = heroi.maxHp;
+            heroi.maxMp += 5;
+            heroi.mp = heroi.maxMp;
+            alert(`Parabéns! Você subiu para o nível ${heroi.lv}!`);
+        }
+        atualizarInventario();
+        atualizarStatus();
+        salvarNoLocalStorage();
+
+        // reset inimigo
+        inimigoAtual=null;
+        document.getElementById('enemyIcon').textContent='?';
+        document.getElementById('enemyNome').textContent='Nenhum inimigo';
+        document.getElementById('enemyHP').textContent='0/0';
+        document.getElementById('enemyMaxHP').textContent='0';
+        document.getElementById('btnAtacar').disabled=true;
+        document.getElementById('btnSair').disabled = true;
+        return;
+    }
+
+    // Inimigo ataca
+    const danoInimigo = Math.max(1, inimigoAtual.atk - heroi.def);
+    heroi.hp -= danoInimigo;
+    if(heroi.hp < 0) heroi.hp = 0;
+    alert(`${inimigoAtual.nome} causou ${danoInimigo} de dano em você!`);
+    
+    if(heroi.hp <= 0){
+        alert('Você foi derrotado! Recuperando HP e MP...');
+        heroi.hp = heroi.maxHp;
+        heroi.mp = heroi.maxMp;
+    }
+    
+    atualizarStatus();
+    salvarNoLocalStorage();
+}
+
 // Event Listeners para o sistema de pesquisa
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('searchInput');
@@ -1476,7 +1616,7 @@ notification.style.opacity = '0';
 }
 
 // ==========================================================
-// FUNÇÕES DE EXIBIÇÃO DE ITENS (COM ATRIBUTOS) - ALTERAÇÃO AQUI
+// FUNÇÕES DE EXIBIÇÃO DE ITENS (COM ATRIBUTOS)
 // ==========================================================
 
 // Função auxiliar para formatar os atributos de um item em HTML
@@ -1501,7 +1641,7 @@ function formatarAtributos(item) {
     return html;
 }
 
-// 1. Mostrar itens na loja com paginação (ATUALIZADA)
+// 1. Mostrar itens na loja com paginação
 function mostrarItens() {
     const container = document.getElementById('itensContainer');
     container.innerHTML = '';
@@ -1570,7 +1710,7 @@ atualizarInventario();
 atualizarStatus();
 }
 
-// 2. Atualizar inventário (ATUALIZADA)
+// 2. Atualizar inventário
 function atualizarInventario() {
     const div = document.getElementById('inventory');
     div.innerHTML='';
@@ -1617,36 +1757,53 @@ function usarPocaoEspecifica(id) {
     atualizarStatus();
 }
 
-// Equipar itens do inventário
+// ========================
+// CORREÇÃO: Equipar itens do inventário
+// ========================
+
 function equiparItemDoInventario(id) {
-const itemIndex = heroi.inventory.findIndex(i => i.id === id);
-if (itemIndex === -1) return;
-const item = heroi.inventory[itemIndex];
+    const itemIndex = heroi.inventory.findIndex(i => i.id === id);
+    if (itemIndex === -1) return;
+    const item = heroi.inventory[itemIndex];
 
-let slotEquip = null;
-if (item.tipo === 'arma') slotEquip = 'equipWeapon';
-else if (item.tipo === 'off') slotEquip = 'equipOffhand';
-else if (item.tipo === 'amu') slotEquip = 'equipAmulet';
-else if (item.tipo === 'equip') slotEquip = 'equipWeapon'; // Assume equip vai para o slot de arma por padrão
+    let itemRemovido = null;
+    
+    if (item.tipo === 'arma') {
+        itemRemovido = heroi.equipWeapon;
+        heroi.equipWeapon = item;
+    } else if (item.tipo === 'off') {
+        itemRemovido = heroi.equipOffhand;
+        heroi.equipOffhand = item;
+    } else if (item.tipo === 'amu') {
+        itemRemovido = heroi.equipAmulet;
+        heroi.equipAmulet = item;
+    } else if (item.tipo === 'equip') {
+        itemRemovido = heroi.equipWeapon;
+        heroi.equipWeapon = item;
+    } else {
+        alert('Este item não pode ser equipado.');
+        return;
+    }
 
-if (!slotEquip) {
-alert('Este item não pode ser equipado.');
-return;
-}
+    // Remove o item do inventário
+    heroi.inventory.splice(itemIndex, 1);
 
-const itemRemovido = heroi[slotEquip];
-heroi[slotEquip] = item;
-heroi.inventory.splice(itemIndex, 1);
+    // Adiciona o item removido de volta ao inventário, se existir
+    if (itemRemovido) {
+        let itemExistente = heroi.inventory.find(i => i.id === itemRemovido.id);
+        if (itemExistente) {
+            itemExistente.quantidade = (itemExistente.quantidade || 1) + 1;
+        } else {
+            heroi.inventory.push({ ...itemRemovido, quantidade: 1 });
+        }
+        alert(`Você removeu ${itemRemovido.nome} e equipou ${item.nome}.`);
+    } else {
+        alert(`Você equipou ${item.nome}.`);
+    }
 
-if (itemRemovido) {
-heroi.inventory.push(itemRemovido);
-alert(`Você removeu ${itemRemovido.nome} e equipou ${item.nome}.`);
-} else {
-alert(`Você equipou ${item.nome}.`);
-}
-
-recalcularStatus();
-atualizarStatus();
+    recalcularStatus();
+    atualizarInventario();
+    atualizarStatus();
 }
 
 // Usar Poção (função original - usa qualquer poção disponível)
@@ -1676,7 +1833,7 @@ atualizarStatus();
 }
 
 // ========================
-// Sistema de luta (ATUALIZADO - não perde status/inventário ao morrer)
+// Sistema de luta
 // ========================
 
 function encontrarInimigo() {
@@ -1699,7 +1856,7 @@ document.getElementById('btnAtacar').disabled = false;
 document.getElementById('btnSair').disabled = false; // Habilita o Sair
 }
 
-// Função para sair do combate (ATUALIZADA)
+// Função para sair do combate
 function sairDoCombate() {
     if (!inimigoAtual) return;
 
@@ -1732,87 +1889,6 @@ function sairDoCombate() {
     });
 }
 
-
-function atacar() {
-if(!inimigoAtual) return;
-// Dano do herói
-let danoHerói = Math.max(1, Math.floor(heroi.atk * (1 + Math.random()*0.5))) - (inimigoAtual.def || 0);
-if(danoHerói<1) danoHerói=1;
-inimigoAtual.hp -= danoHerói;
-if(inimigoAtual.hp<0) inimigoAtual.hp=0;
-// Atualiza o HP do inimigo
-document.getElementById('enemyHP').textContent = `${inimigoAtual.hp}/${inimigoAtual.hpMax}`;
-
-alert(`Você causou ${danoHerói} de dano!`);
-
-if(inimigoAtual.hp<=0){
-alert(`Inimigo ${inimigoAtual.nome} derrotado!`);
-const ouroGanhos = Math.floor(Math.random()*(inimigoAtual.gold[1]-inimigoAtual.gold[0]+1))+inimigoAtual.gold[0];
-heroi.gold+=ouroGanhos;
-const xpGanhos = 10+Math.floor(Math.random()*10);
-heroi.xp+=xpGanhos;
-alert(`Ganhou ${ouroGanhos} ouro e ${xpGanhos} XP!`);
-
-// Drop de item raro (somente se for um boss)
-if (inimigoAtual.drops && inimigoAtual.drops.length > 0) {
-for(const [itemName, dropChance] of inimigoAtual.drops){
-if (Math.random() < dropChance) {
-const itemDrop = ITEMS.find(i => i.nome === itemName);
-if (itemDrop) {
-let invItem = heroi.inventory.find(i=>i.id===itemDrop.id);
-if(invItem){
-invItem.quantidade=(invItem.quantidade||1)+1;
-} else {
-heroi.inventory.push({ ...itemDrop, quantidade:1 });
-}
-mostrarNotificacao(`Você recebeu um item raro: ${itemDrop.nome}!`);
-}
-}
-}
-}
-
-// Subir de nível
-const xpNecessaria=heroi.lv*50;
-if(heroi.xp>=xpNecessaria) {
-heroi.lv++;
-heroi.xp-=xpNecessaria;
-heroi.maxHp+=10;
-heroi.hp=heroi.maxHp;
-heroi.maxMp+=5;
-heroi.mp=heroi.maxMp;
-alert(`Parabéns! Você subiu para o nível ${heroi.lv}!`);
-}
-atualizarInventario();
-atualizarStatus();
-salvarNoLocalStorage(); // salva após ganhar xp e subir de nível
-
-// reset inimigo
-inimigoAtual=null;
-document.getElementById('enemyIcon').textContent='?';
-document.getElementById('enemyNome').textContent='Nenhum inimigo';
-document.getElementById('enemyHP').textContent='0/0';
-document.getElementById('enemyMaxHP').textContent='0';
-document.getElementById('btnAtacar').disabled=true;
-document.getElementById('btnSair').disabled = true; // Desabilita o Sair
-return;
-}
-
-// Inimigo ataca
-const danoInimigo = Math.max(0, inimigoAtual.atk - heroi.def);
-heroi.hp -= danoInimigo;
-if(heroi.hp<0) heroi.hp=0;
-alert(`${inimigoAtual.nome} causou ${danoInimigo} de dano em você!`);
-if(heroi.hp<=0){
-// ALTERAÇÃO AQUI: Ao morrer, apenas recupera HP/MP sem perder status, inventário ou equipamentos
-alert('Você foi derrotado! Recuperando HP e MP...');
-heroi.hp = heroi.maxHp;
-heroi.mp = heroi.maxMp;
-// Não chama resetHerói() - mantém todo o progresso
-}
-atualizarStatus();
-salvarNoLocalStorage(); // salva após ataque
-}
-
 // Função resetHerói mantida para outros usos, mas não é mais chamada ao morrer
 function resetHerói() {
 heroi.hp=heroi.maxHp;
@@ -1828,29 +1904,46 @@ recalcularStatus();
 salvarNoLocalStorage(); // salva o reset
 }
 
-// Recalcular status do herói com base nos equipamentos
-function recalcularStatus() {
-// Status base
-heroi.atk = 10;
-heroi.def = 5;
-heroi.crit = 3;
-heroi.maxHp = 100 + (heroi.lv - 1) * 10; // Mantém o bônus de nível
-heroi.maxMp = 30 + (heroi.lv - 1) * 5; // Mantém o bônus de nível
+// ========================
+// CORREÇÃO: Recalcular status do herói com base nos equipamentos
+// ========================
 
-// Adiciona status dos equipamentos
-if (heroi.equipWeapon) {
-heroi.atk += heroi.equipWeapon.min || 0;
-heroi.crit += heroi.equipWeapon.crit || 0;
-}
-if (heroi.equipOffhand) {
-heroi.def += heroi.equipOffhand.def || 0;
-}
-if (heroi.equipAmulet) {
-heroi.maxHp += heroi.equipAmulet.bonusHP || 0;
-heroi.maxMp += heroi.equipAmulet.bonusMP || 0;
-heroi.crit += heroi.equipAmulet.bonusCRIT || 0;
-heroi.atk += heroi.equipAmulet.bonusATK || 0;
-}
+function recalcularStatus() {
+    // Status base
+    let baseAtk = 10;
+    let baseDef = 5;
+    let baseCrit = 3;
+    let baseMaxHp = 100 + (heroi.lv - 1) * 10;
+    let baseMaxMp = 30 + (heroi.lv - 1) * 5;
+
+    // Reset para valores base
+    heroi.atk = baseAtk;
+    heroi.def = baseDef;
+    heroi.crit = baseCrit;
+    heroi.maxHp = baseMaxHp;
+    heroi.maxMp = baseMaxMp;
+
+    // Adiciona status dos equipamentos (SOMENTE bônus)
+    if (heroi.equipWeapon) {
+        // Para armas, o dano min/max é usado no cálculo do ataque, não como bônus fixo
+        // O bônus crítico da arma é adicionado
+        heroi.crit += heroi.equipWeapon.crit || 0;
+    }
+    
+    if (heroi.equipOffhand) {
+        heroi.def += heroi.equipOffhand.def || 0;
+    }
+    
+    if (heroi.equipAmulet) {
+        heroi.maxHp += heroi.equipAmulet.bonusHP || 0;
+        heroi.maxMp += heroi.equipAmulet.bonusMP || 0;
+        heroi.crit += heroi.equipAmulet.bonusCRIT || 0;
+        heroi.atk += heroi.equipAmulet.bonusATK || 0;
+    }
+    
+    // Garante que o HP atual não exceda o máximo
+    if (heroi.hp > heroi.maxHp) heroi.hp = heroi.maxHp;
+    if (heroi.mp > heroi.maxMp) heroi.mp = heroi.maxMp;
 }
 
 // ========================
@@ -1859,43 +1952,50 @@ heroi.atk += heroi.equipAmulet.bonusATK || 0;
 mostrarItens();
 
 // ========================
-// 3. Atualiza a UI (incluindo Equipamento) (ATUALIZADA)
+// 3. CORREÇÃO: Atualiza a UI (incluindo Equipamento com botões de desequipar)
 // ========================
+
 function atualizarStatus() {
-document.getElementById('hpLabel').textContent = `${heroi.hp}/${heroi.maxHp}`;
-document.getElementById('hpBar').style.width = (heroi.hp / heroi.maxHp * 100) + '%';
+    document.getElementById('hpLabel').textContent = `${heroi.hp}/${heroi.maxHp}`;
+    document.getElementById('hpBar').style.width = (heroi.hp / heroi.maxHp * 100) + '%';
 
-document.getElementById('mpLabel').textContent = `${heroi.mp}/${heroi.maxMp}`;
-document.getElementById('mpBar').style.width = (heroi.mp / heroi.maxMp * 100) + '%';
+    document.getElementById('mpLabel').textContent = `${heroi.mp}/${heroi.maxMp}`;
+    document.getElementById('mpBar').style.width = (heroi.mp / heroi.maxMp * 100) + '%';
 
-const xpNecessaria=heroi.lv*50;
-document.getElementById('xpLabel').textContent = `${heroi.xp} / ${xpNecessaria}`;
-document.getElementById('xpBar').style.width = (heroi.xp / xpNecessaria * 100) + '%';
+    const xpNecessaria=heroi.lv*50;
+    document.getElementById('xpLabel').textContent = `${heroi.xp} / ${xpNecessaria}`;
+    document.getElementById('xpBar').style.width = (heroi.xp / xpNecessaria * 100) + '%';
 
-document.getElementById('rankTag').textContent = `Nv ${heroi.lv}`;
-document.getElementById('goldVal').textContent = heroi.gold;
-document.getElementById('atkVal').textContent=heroi.atk;
-document.getElementById('defVal').textContent=heroi.def;
-document.getElementById('critVal').textContent=heroi.crit+'%';
+    document.getElementById('rankTag').textContent = `Nv ${heroi.lv}`;
+    document.getElementById('goldVal').textContent = heroi.gold;
+    document.getElementById('atkVal').textContent=heroi.atk;
+    document.getElementById('defVal').textContent=heroi.def;
+    document.getElementById('critVal').textContent=heroi.crit+'%';
 
-// Atualiza equipamentos na UI com os stats
-const weaponName = heroi.equipWeapon ? heroi.equipWeapon.nome : 'Nenhuma';
-const weaponStats = heroi.equipWeapon ? formatarAtributos(heroi.equipWeapon) : '';
-document.getElementById('eq-weapon').innerHTML = `${weaponName} ${weaponStats}`;
+    // Atualiza equipamentos na UI com os stats e botões de desequipar
+    const weaponName = heroi.equipWeapon ? heroi.equipWeapon.nome : 'Nenhuma';
+    const weaponStats = heroi.equipWeapon ? formatarAtributos(heroi.equipWeapon) : '';
+    const weaponBtn = heroi.equipWeapon ? 
+        `<button class="buttonnn" style="background: #bf6d3f; font-size: 11px; padding: 1px 4px; margin-left: 5px;" onclick="desequiparItem('weapon')">X</button>` : '';
+    document.getElementById('eq-weapon').innerHTML = `${weaponName} ${weaponStats} ${weaponBtn}`;
 
-const offhandName = heroi.equipOffhand ? heroi.equipOffhand.nome : 'Nenhum';
-const offhandStats = heroi.equipOffhand ? formatarAtributos(heroi.equipOffhand) : '';
-document.getElementById('eq-offhand').innerHTML = `${offhandName} ${offhandStats}`;
+    const offhandName = heroi.equipOffhand ? heroi.equipOffhand.nome : 'Nenhum';
+    const offhandStats = heroi.equipOffhand ? formatarAtributos(heroi.equipOffhand) : '';
+    const offhandBtn = heroi.equipOffhand ? 
+        `<button class="buttonnn" style="background: #bf6d3f; font-size: 11px; padding: 1px 4px; margin-left: 5px;" onclick="desequiparItem('offhand')">X</button>` : '';
+    document.getElementById('eq-offhand').innerHTML = `${offhandName} ${offhandStats} ${offhandBtn}`;
 
-const amuletName = heroi.equipAmulet ? heroi.equipAmulet.nome : 'Nenhum';
-const amuletStats = heroi.equipAmulet ? formatarAtributos(heroi.equipAmulet) : '';
-document.getElementById('eq-amulet').innerHTML = `${amuletName} ${amuletStats}`;
+    const amuletName = heroi.equipAmulet ? heroi.equipAmulet.nome : 'Nenhum';
+    const amuletStats = heroi.equipAmulet ? formatarAtributos(heroi.equipAmulet) : '';
+    const amuletBtn = heroi.equipAmulet ? 
+        `<button class="buttonnn" style="background: #bf6d3f; font-size: 11px; padding: 1px 4px; margin-left: 5px;" onclick="desequiparItem('amulet')">X</button>` : '';
+    document.getElementById('eq-amulet').innerHTML = `${amuletName} ${amuletStats} ${amuletBtn}`;
 
-// Atualiza inventário
-atualizarInventario();
+    // Atualiza inventário
+    atualizarInventario();
 
-// Salva toda vez que atualiza
-salvarNoLocalStorage();
+    // Salva toda vez que atualiza
+    salvarNoLocalStorage();
 }
 
 // ========================
@@ -1904,6 +2004,8 @@ salvarNoLocalStorage();
 if(heroi.inventory.length === 0) {
 heroi.inventory.push({ ...itemInicialArma, quantidade: 1 });
 heroi.inventory.push({ ...itemInicialPocao, quantidade: 1 });
+heroi.equipWeapon = itemInicialArma; // Equipar arma inicial
+recalcularStatus();
 }
 carregarDoLocalStorage();
 atualizarStatus();
