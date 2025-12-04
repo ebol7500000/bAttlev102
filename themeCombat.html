@@ -877,12 +877,73 @@ function exportarBackup() {
     mostrarNotificacao('Backup exportado com sucesso!');
 }
 
-// Importar backup
+// Importar backup - CORREÇÃO AQUI
 function importarBackup() {
-    abrirModalBackup('importar');
+    // Cria um input de arquivo oculto
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.json';
+    fileInput.style.display = 'none';
+    
+    fileInput.onchange = function(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const backupData = JSON.parse(e.target.result);
+                
+                // Validação do backup
+                if (!backupData.heroi || !backupData.heroi.nome) {
+                    throw new Error('Formato de backup inválido.');
+                }
+                
+                // Verifica limite de backups
+                if (backups.length >= MAX_BACKUPS) {
+                    alert(`Limite de ${MAX_BACKUPS} backups atingido. Exclua um backup antigo primeiro.`);
+                    return;
+                }
+                
+                // Prepara o backup para salvar
+                const novoBackup = {
+                    id: Date.now(),
+                    nome: backupData.nome || `Backup Importado ${new Date().toLocaleDateString()}`,
+                    data: backupData.data || new Date().toLocaleString('pt-BR'),
+                    heroi: backupData.heroi,
+                    version: backupData.version || '1.0'
+                };
+                
+                // Confirmação antes de importar
+                if (confirm(`Deseja importar o backup "${novoBackup.nome}"?\nNível: ${novoBackup.heroi.lv}\nOuro: ${novoBackup.heroi.gold}`)) {
+                    backups.unshift(novoBackup);
+                    
+                    if (backups.length > MAX_BACKUPS) {
+                        backups = backups.slice(0, MAX_BACKUPS);
+                    }
+                    
+                    salvarBackups();
+                    atualizarListaBackups();
+                    
+                    mostrarNotificacao(`Backup "${novoBackup.nome}" importado com sucesso!`);
+                }
+                
+            } catch (error) {
+                alert('Erro ao importar backup. Verifique se o arquivo está correto.\nErro: ' + error.message);
+                console.error(error);
+            }
+        };
+        
+        reader.readAsText(file);
+    };
+    
+    // Adiciona ao corpo e clica
+    document.body.appendChild(fileInput);
+    fileInput.click();
+    document.body.removeChild(fileInput);
 }
 
-// Confirmar importação de backup
+// Confirmar importação de backup (para importação manual via texto)
 function confirmarImportarBackup() {
     const input = document.getElementById('backupNameInput');
     const backupString = input.value.trim();
