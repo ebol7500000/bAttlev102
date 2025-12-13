@@ -25,7 +25,7 @@ width: 150px;
 }
 * { box-sizing: border-box; }
 html, body { height: 100%; margin: 0; font-family: Roboto, system-ui, -apple-system, Segoe UI, Arial; color: var(--text); background: radial-gradient(1200px 800px at 20% 10%, #252219, var(--bg)); }
-#lutaSistema { display: flex; align-items: center; gap: 10px; padding: 10px; background: #2a2a25; border-radius: 12px; margin-bottom: 16px; }
+#lutaSistema { display: flex; align-items: center; gap: 10px; padding: 10px; background: #2a2a25; border-radius: 12px; margin-bottom: 16px; position: relative; }
 #lutaSistema button { padding: 8px 12px; border: none; border-radius: 8px; cursor: pointer; background: #d4a761; font-weight: 700; }
 #lutaSistema button:hover { filter: brightness(1.1); }
 .grid { display: grid; grid-template-columns: 320px 1fr; gap: 16px; }
@@ -43,9 +43,9 @@ html, body { height: 100%; margin: 0; font-family: Roboto, system-ui, -apple-sys
 .bar { width: 150px; height: 16px; border-radius: 8px; overflow: hidden; margin-top: 4px; border: white }
 #statusPanel .equip-slot { display: grid; grid-template-columns: 110px 1fr; gap: 8px; align-items: center; margin-bottom: 4px; }
 #statusPanel span.equip { font-weight: bold; }
-#enemyInfo { display: flex; align-items: center; gap: 12px; background: #2a2a25; padding: 10px; border-radius: 8px; margin-top: 8px; }
+#enemyInfo { display: flex; align-items: center; gap: 12px; background: #2a2a25; padding: 10px; border-radius: 8px; margin-top: 8px; position: relative; }
 #enemyIcon { font-size: 30px; }
-#notification { position: fixed; top: 20px; right: 20px; background-color: #d4a761; color: var(--bg); padding: 10px 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); transition: opacity 0.5s ease-in-out; opacity: 0; z-index: 1000; }
+/* NOTIFICAÇÃO REMOVIDA DAQUI */
 /* --- Fim do Código CSS Original --- */
 
 /* --- Estilos para exibição de status dos itens --- */
@@ -606,6 +606,216 @@ html, body { height: 100%; margin: 0; font-family: Roboto, system-ui, -apple-sys
     100% { opacity: 1; }
 }
 
+/* --- ANIMAÇÕES DE DANO ATUALIZADAS --- */
+.damage-popup {
+    position: absolute;
+    font-size: 24px;
+    font-weight: bold;
+    z-index: 1000;
+    pointer-events: none;
+    animation: damageFloat 1.5s ease-out forwards;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+@keyframes damageFloat {
+    0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    50% {
+        opacity: 1;
+        transform: translateY(-30px) scale(1.2);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-60px) scale(1.5);
+    }
+}
+
+.damage-enemy {
+    color: #ff4444; /* Vermelho para dano no inimigo (MANTIDO) */
+}
+
+.damage-crit {
+    color: #ffaa00; /* Laranja para crítico */
+    font-size: 28px;
+    text-shadow: 0 0 10px rgba(255, 170, 0, 0.5);
+}
+
+.damage-blocked {
+    color: #cccccc; /* Cinza para bloqueado */
+    font-size: 20px;
+}
+
+/* NOVO: Animação verde para cura */
+.damage-heal {
+    color: #44ff44; /* Verde para cura */
+    font-size: 24px;
+    text-shadow: 0 0 8px rgba(68, 255, 68, 0.5);
+}
+
+/* Container para animações de dano */
+#damageContainer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 999;
+}
+
+/* --- NOVO: Estilos para o Dropdown de Notificações --- */
+.notifications-dropdown {
+    position: fixed;
+    top: 70px;
+    right: 20px;
+    z-index: 999;
+    width: 300px;
+}
+
+.notifications-toggle {
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s;
+}
+
+.notifications-toggle:hover {
+    background: var(--accent2);
+    transform: translateY(-2px);
+}
+
+.notifications-toggle .badge {
+    background: var(--danger);
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.notifications-container {
+    background: var(--card);
+    border: 2px solid var(--accent);
+    border-radius: 8px;
+    margin-top: 8px;
+    max-height: 400px;
+    overflow-y: auto;
+    display: none;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.notifications-container.show {
+    display: block;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.notifications-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    border-bottom: 1px solid #323025;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.notifications-header h4 {
+    margin: 0;
+    color: var(--accent);
+}
+
+.notifications-clear {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.notifications-clear:hover {
+    color: var(--danger);
+    background: rgba(191, 109, 63, 0.1);
+}
+
+.notifications-list {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.notification-item {
+    padding: 12px 15px;
+    border-bottom: 1px solid #323025;
+    transition: background 0.2s;
+    cursor: pointer;
+}
+
+.notification-item:hover {
+    background: rgba(212, 167, 97, 0.1);
+}
+
+.notification-item:last-child {
+    border-bottom: none;
+}
+
+.notification-item.new {
+    background: rgba(163, 191, 63, 0.1);
+    border-left: 3px solid var(--ok);
+}
+
+.notification-item.important {
+    background: rgba(212, 167, 97, 0.1);
+    border-left: 3px solid var(--accent);
+}
+
+.notification-item.warning {
+    background: rgba(191, 109, 63, 0.1);
+    border-left: 3px solid var(--danger);
+}
+
+.notification-content {
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.notification-time {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 4px;
+}
+
+.notifications-empty {
+    text-align: center;
+    padding: 30px 15px;
+    color: var(--muted);
+    font-style: italic;
+}
+
 /* --- Início do Código Responsivo (Tema Egípcio) --- */
 @media (max-width: 900px) {
 :root {
@@ -661,8 +871,8 @@ body {
   color: var(--bg);
   border-radius: 4px;
   padding: 2px 6px;
-  font-weight: bold;
-  text-transform: uppercase;
+    font-weight: bold;
+    text-transform: uppercase;
 }
 
 /* Ajustes nas barras de status */
@@ -715,16 +925,7 @@ body {
   padding: 4px 8px;
 }
 
-#notification {
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 80%;
-  text-align: center;
-  background: var(--accent);
-  color: var(--bg);
-  border: 2px solid var(--accent2);
-}
+/* NOTIFICAÇÃO ORIGINAL REMOVIDA - substituída pelo dropdown */
 
 /* Ajustes para o filtro em mobile */
 .search-container {
@@ -785,12 +986,84 @@ body {
 .stat-line {
     font-size: 12px;
 }
+
+/* Ajustes para o dropdown de notificações em mobile */
+.notifications-dropdown {
+    position: fixed;
+    top: 60px;
+    right: 10px;
+    left: 10px;
+    width: auto;
+    z-index: 1000;
+}
+
+.notifications-container {
+    max-height: 300px;
+}
+
+.notifications-toggle {
+    width: 100%;
+    justify-content: center;
+}
+
+/* Ajustes para animações de dano em mobile */
+.damage-popup {
+    font-size: 20px;
+}
+
+.damage-crit {
+    font-size: 24px;
+}
 }
 /* --- Fim do Código Responsivo --- */
+
+/* --- Estilo para exibir atributos dos itens na loja --- */
+.item-attributes {
+    font-size: 12px;
+    color: var(--accent);
+    margin-top: 4px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.attr-badge {
+    background: rgba(212, 167, 97, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid rgba(212, 167, 97, 0.3);
+    font-weight: bold;
+}
+
+.item-info {
+    flex-grow: 1;
+}
 </style>
 </head>
 <body>
+<!-- Container para animações de dano -->
+<div id="damageContainer"></div>
 
+<!-- Dropdown de Notificações -->
+<div class="notifications-dropdown">
+    <button class="notifications-toggle" onclick="toggleNotifications()">
+        🔔 Notificações <span class="badge" id="notificationBadge">0</span>
+    </button>
+    <div class="notifications-container" id="notificationsContainer">
+        <div class="notifications-header">
+            <h4>Notificações</h4>
+            <button class="notifications-clear" onclick="clearNotifications()">Limpar Tudo</button>
+        </div>
+        <ul class="notifications-list" id="notificationsList">
+            <li class="notifications-empty">Nenhuma notificação</li>
+        </ul>
+    </div>
+</div>
+
+<div id="frame" style="width: 100%;margin: auto;position: relative; z-index: 99998;">
+          <iframe data-aa='2420409' src='//acceptable.a-ads.com/2420409/?size=Adaptive'
+                            style='border:0; padding:0; width:70%; height:auto; overflow:hidden;display: block;margin: auto'></iframe>
+        </div>
 <div class="container">
 
 <div id="lutaSistema">
@@ -915,7 +1188,7 @@ body {
 
 <div class="foot"> grind fácil até 10 · médio até 60 · XP reduzida no 100 · itens até 50.000.000 ouro · Níveis ilimitados</div>
 
-<div id="notification"></div>
+<!-- NOTIFICAÇÃO ORIGINAL REMOVIDA -->
 
 <div id="videoContainer" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 9999; display: none;">
     <video id="cutsceneVideo" src="./cust_scene_getting_out.mp4" style="width: 100%; height: 100%; object-fit: contain;"></video>
@@ -965,6 +1238,202 @@ body {
 
 <script>
 // ========================
+// Sistema de Notificações
+// ========================
+
+let notifications = [];
+const MAX_NOTIFICATIONS = 20; // LIMITE DE 20 NOTIFICAÇÕES
+
+// Inicializar sistema de notificações
+function inicializarNotificacoes() {
+    const savedNotifications = localStorage.getItem('gameNotifications');
+    if (savedNotifications) {
+        notifications = JSON.parse(savedNotifications);
+        // Garantir que não exceda o limite ao carregar
+        if (notifications.length > MAX_NOTIFICATIONS) {
+            notifications = notifications.slice(0, MAX_NOTIFICATIONS);
+        }
+        atualizarBadgeNotificacoes();
+    }
+}
+
+// Adicionar uma nova notificação (CORRIGIDO)
+function adicionarNotificacao(mensagem, tipo = 'normal') {
+    const novaNotificacao = {
+        id: Date.now(),
+        mensagem: mensagem,
+        tipo: tipo,
+        timestamp: new Date().toLocaleTimeString('pt-BR'),
+        lida: false
+    };
+    
+    // ADICIONA NO INÍCIO (notificações mais recentes primeiro)
+    notifications.unshift(novaNotificacao);
+    
+    // LIMITE DE 20 NOTIFICAÇÕES - REMOVE AS MAIS ANTIGAS SE NECESSÁRIO
+    if (notifications.length > MAX_NOTIFICATIONS) {
+        // Remove as notificações mais antigas (do final do array)
+        notifications = notifications.slice(0, MAX_NOTIFICATIONS);
+    }
+    
+    salvarNotificacoes();
+    atualizarListaNotificacoes();
+    atualizarBadgeNotificacoes();
+    
+    // Se o dropdown estiver aberto, atualizar
+    if (document.getElementById('notificationsContainer').classList.contains('show')) {
+        mostrarNotificacoesNoDropdown();
+    }
+}
+
+// Toggle do dropdown de notificações
+function toggleNotifications() {
+    const container = document.getElementById('notificationsContainer');
+    container.classList.toggle('show');
+    
+    if (container.classList.contains('show')) {
+        mostrarNotificacoesNoDropdown();
+        marcarNotificacoesComoLidas();
+    }
+}
+
+// Mostrar notificações no dropdown (CORRIGIDO)
+function mostrarNotificacoesNoDropdown() {
+    const lista = document.getElementById('notificationsList');
+    lista.innerHTML = '';
+    
+    if (notifications.length === 0) {
+        lista.innerHTML = '<li class="notifications-empty">Nenhuma notificação</li>';
+        return;
+    }
+    
+    // As notificações já estão na ordem correta (mais recentes primeiro)
+    notifications.forEach(notif => {
+        const item = document.createElement('li');
+        item.className = `notification-item ${notif.lida ? '' : 'new'} ${notif.tipo}`;
+        item.innerHTML = `
+            <div class="notification-content">${notif.mensagem}</div>
+            <div class="notification-time">${notif.timestamp}</div>
+        `;
+        lista.appendChild(item);
+    });
+}
+
+// Marcar todas as notificações como lidas
+function marcarNotificacoesComoLidas() {
+    notifications.forEach(notif => {
+        notif.lida = true;
+    });
+    salvarNotificacoes();
+    atualizarBadgeNotificacoes();
+}
+
+// Limpar todas as notificações
+function clearNotifications() {
+    if (notifications.length === 0) return;
+    
+    if (confirm('Tem certeza que deseja limpar todas as notificações?')) {
+        notifications = [];
+        salvarNotificacoes();
+        mostrarNotificacoesNoDropdown();
+        atualizarBadgeNotificacoes();
+    }
+}
+
+// Atualizar badge de notificações
+function atualizarBadgeNotificacoes() {
+    const badge = document.getElementById('notificationBadge');
+    const naoLidas = notifications.filter(n => !n.lida).length;
+    badge.textContent = naoLidas;
+    badge.style.display = naoLidas > 0 ? 'flex' : 'none';
+}
+
+// Salvar notificações no localStorage
+function salvarNotificacoes() {
+    localStorage.setItem('gameNotifications', JSON.stringify(notifications));
+}
+
+// Atualizar lista de notificações
+function atualizarListaNotificacoes() {
+    const lista = document.getElementById('notificationsList');
+    if (!lista) return;
+    
+    if (document.getElementById('notificationsContainer').classList.contains('show')) {
+        mostrarNotificacoesNoDropdown();
+    }
+}
+
+// Fechar dropdown quando clicar fora
+document.addEventListener('click', function(event) {
+    const dropdown = document.getElementById('notificationsContainer');
+    const toggle = document.querySelector('.notifications-toggle');
+    
+    if (!dropdown.contains(event.target) && !toggle.contains(event.target)) {
+        dropdown.classList.remove('show');
+    }
+});
+
+// ========================
+// SISTEMA DE ANIMAÇÃO DE DANO ATUALIZADO
+// ========================
+
+function mostrarAnimacaoDano(dano, tipo, elemento, isCritico = false, isBloqueado = false, isCura = false) {
+    const damageContainer = document.getElementById('damageContainer');
+    
+    // Cria o elemento de dano
+    const damageElement = document.createElement('div');
+    damageElement.className = 'damage-popup';
+    
+    // Define o texto e cor baseado no tipo
+    let textoDano = '';
+    let classeCor = '';
+    
+    if (isCura) {
+        // ANIMAÇÃO VERDE PARA CURA
+        textoDano = `+${dano} HP`;
+        classeCor = 'damage-heal';
+    } else if (isBloqueado) {
+        textoDano = 'BLOQUEADO';
+        classeCor = 'damage-blocked';
+    } else if (isCritico) {
+        textoDano = `-${dano} CRÍTICO!`;
+        classeCor = 'damage-crit';
+    } else if (tipo === 'enemy') {
+        // ANIMAÇÃO VERMELHA PARA DANO NO INIMIGO (MANTIDA)
+        textoDano = `-${dano}`;
+        classeCor = 'damage-enemy';
+    }
+    // REMOVIDO: animação azul para dano no jogador
+    
+    damageElement.textContent = textoDano;
+    if (classeCor) {
+        damageElement.classList.add(classeCor);
+    }
+    
+    // Posiciona o elemento relativo ao alvo
+    const rect = elemento.getBoundingClientRect();
+    const centerX = rect.left + (rect.width / 2);
+    const centerY = rect.top + (rect.height / 2);
+    
+    // Posição aleatória levemente deslocada para parecer mais natural
+    const offsetX = (Math.random() * 40) - 20;
+    const offsetY = (Math.random() * 20) - 10;
+    
+    damageElement.style.left = `${centerX + offsetX}px`;
+    damageElement.style.top = `${centerY + offsetY}px`;
+    
+    // Adiciona ao container
+    damageContainer.appendChild(damageElement);
+    
+    // Remove após a animação
+    setTimeout(() => {
+        if (damageElement.parentNode) {
+            damageElement.parentNode.removeChild(damageElement);
+        }
+    }, 1500);
+}
+
+// ========================
 // Sistema de Backup
 // ========================
 
@@ -983,7 +1452,7 @@ function inicializarBackup() {
 // Criar um novo backup
 function criarBackup() {
     if (backups.length >= MAX_BACKUPS) {
-        alert(`Limite de ${MAX_BACKUPS} backups atingido. Exclua um backup antigo para criar um novo.`);
+        adicionarNotificacao(`Limite de ${MAX_BACKUPS} backups atingido. Exclua um backup antigo para criar um novo.`, 'warning');
         return;
     }
     
@@ -1041,7 +1510,7 @@ function confirmarCriarBackup() {
     atualizarListaBackups();
     fecharModalBackup();
     
-    mostrarNotificacao(`Backup "${backupData.nome}" criado com sucesso!`);
+    adicionarNotificacao(`Backup "${backupData.nome}" criado com sucesso!`, 'important');
 }
 
 // Restaurar backup
@@ -1058,7 +1527,7 @@ function restaurarBackup(backupId) {
     atualizarStatus();
     atualizarInventario();
     
-    mostrarNotificacao(`Backup "${backup.nome}" restaurado com sucesso!`);
+    adicionarNotificacao(`Backup "${backup.nome}" restaurado com sucesso!`, 'important');
 }
 
 // Excluir backup
@@ -1071,7 +1540,7 @@ function excluirBackup(backupId) {
     salvarBackups();
     atualizarListaBackups();
     
-    mostrarNotificacao('Backup excluído com sucesso!');
+    adicionarNotificacao('Backup excluído com sucesso!');
 }
 
 // Exportar backup como texto
@@ -1095,7 +1564,7 @@ function exportarBackup() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     
-    mostrarNotificacao('Backup exportado com sucesso!');
+    adicionarNotificacao('Backup exportado com sucesso!', 'important');
 }
 
 // Importar backup
@@ -1122,7 +1591,7 @@ function importarBackup() {
                 
                 // Verifica limite de backups
                 if (backups.length >= MAX_BACKUPS) {
-                    alert(`Limite de ${MAX_BACKUPS} backups atingido. Exclua um backup antigo primeiro.`);
+                    adicionarNotificacao(`Limite de ${MAX_BACKUPS} backups atingido. Exclua um backup antigo primeiro.`, 'warning');
                     return;
                 }
                 
@@ -1146,11 +1615,11 @@ function importarBackup() {
                     salvarBackups();
                     atualizarListaBackups();
                     
-                    mostrarNotificacao(`Backup "${novoBackup.nome}" importado com sucesso!`);
+                    adicionarNotificacao(`Backup "${novoBackup.nome}" importado com sucesso!`, 'important');
                 }
                 
             } catch (error) {
-                alert('Erro ao importar backup. Verifique se o arquivo está correto.\nErro: ' + error.message);
+                adicionarNotificacao('Erro ao importar backup. Verifique se o arquivo está correto.', 'warning');
                 console.error(error);
             }
         };
@@ -1170,7 +1639,7 @@ function confirmarImportarBackup() {
     const backupString = input.value.trim();
     
     if (!backupString) {
-        alert('Por favor, cole o código do backup.');
+        adicionarNotificacao('Por favor, cole o código do backup.', 'warning');
         return;
     }
     
@@ -1183,7 +1652,7 @@ function confirmarImportarBackup() {
         }
         
         if (backups.length >= MAX_BACKUPS) {
-            alert(`Limite de ${MAX_BACKUPS} backups atingido. Exclua um backup antigo primeiro.`);
+            adicionarNotificacao(`Limite de ${MAX_BACKUPS} backups atingido. Exclua um backup antigo primeiro.`, 'warning');
             return;
         }
         
@@ -1205,10 +1674,10 @@ function confirmarImportarBackup() {
         atualizarListaBackups();
         fecharModalBackup();
         
-        mostrarNotificacao(`Backup "${backupData.nome}" importado com sucesso!`);
+        adicionarNotificacao(`Backup "${backupData.nome}" importado com sucesso!`, 'important');
         
     } catch (error) {
-        alert('Erro ao importar backup. Verifique se o código está correto.');
+        adicionarNotificacao('Erro ao importar backup. Verifique se o código está correto.', 'warning');
         console.error(error);
     }
 }
@@ -1281,9 +1750,6 @@ function fecharConfirmacaoRecomecar() {
 function confirmarRecomecar() {
     // Fechar modal
     fecharConfirmacaoRecomecar();
-    
-    // Mostrar mensagem final
-    alert('Reiniciando o jogo... Tudo será resetado para os valores iniciais.');
     
     // Executar o reset completo
     recomecarJogoCompleto();
@@ -1381,13 +1847,8 @@ function recomecarJogoCompleto() {
     // Salvar estado resetado
     salvarNoLocalStorage();
     
-    // Mostrar notificação de sucesso
-    mostrarNotificacao('Jogo recomeçado com sucesso! Status resetados para os valores iniciais.');
-    
-    // Mostrar mensagem adicional
-    setTimeout(() => {
-        alert('✅ Jogo recomeçado!\n\n• Nível: 1\n• HP/MP: Máximos\n• Inventário: Resetado\n• Equipamentos: Apenas espada inicial\n• Ouro: 0\n\nBoa sorte na nova jornada!');
-    }, 500);
+    // Adicionar notificação de sucesso
+    adicionarNotificacao('Jogo recomeçado com sucesso! Status resetados para os valores iniciais.', 'important');
 }
 
 // ========================
@@ -1434,7 +1895,7 @@ const pocaoCuraEpica = {
 };
 itens.push(pocaoCuraEpica);
 
-// Gerar 3000 itens
+// Gerar 3000 itens - GARANTINDO QUE TODOS TENHAM ATRIBUTOS
 for(let i=1; i<=3000; i++){
     const tipoRand = Math.random();
     let preco;
@@ -1471,23 +1932,27 @@ for(let i=1; i<=3000; i++){
         nome:`${nomeItem} #${i}`, 
         preco:preco, 
         tipo:tipo, 
-        isEquipavel:isEquipavel 
+        isEquipavel:isEquipavel,
+        elem: elem // TODOS os itens têm elemento
     };
 
     // Atributos baseados no preço (escalonado para 3000 itens)
     const statBase = Math.pow(preco, 1/3.5); // Ajustado para melhor progressão
 
+    // GARANTIR QUE TODOS OS ITENS TENHAM PELO MENOS 3 ATRIBUTOS VISÍVEIS
     if(tipo==='arma'){
         item.min = Math.floor(statBase * 2) + 5;
         item.max = item.min + Math.floor(statBase * 1.5) + 10;
         item.crit = Math.floor(statBase) + 2;
         item.vel = (Math.random()*0.7+0.5).toFixed(2);
-        item.elem = elem;
         // Adiciona bônus para itens caros
         if(preco > 1000000) {
             item.bonusATK = Math.floor(statBase / 4) + 5;
             item.bonusCRIT = Math.floor(statBase / 5) + 3;
         }
+        // Garante pelo menos 3 atributos
+        if (!item.bonusATK) item.bonusATK = Math.floor(statBase / 3) + 1;
+        if (!item.bonusHP) item.bonusHP = Math.floor(statBase * 2) + 10;
     } else if(tipo==='off'){
         item.def = Math.floor(statBase * 1.5) + 5;
         item.bloco = Math.floor(statBase * 2) + 15;
@@ -1496,11 +1961,15 @@ for(let i=1; i<=3000; i++){
             item.bonusDEF = Math.floor(statBase / 3) + 5;
             item.bonusHP = Math.floor(statBase * 3) + 20;
         }
+        // Garante pelo menos 3 atributos
+        if (!item.bonusDEF) item.bonusDEF = Math.floor(statBase / 2) + 2;
+        if (!item.bonusHP) item.bonusHP = Math.floor(statBase * 1.5) + 15;
+        item.bonusMP = Math.floor(statBase) + 5;
     } else if(tipo==='amu'){
         // Amuletos podem ter múltiplos bônus
         const numBonus = Math.floor(Math.random() * 4) + 2;
         for(let b=0; b<numBonus; b++){
-            const bonusType = Math.floor(Math.random() * 5);
+            const bonusType = Math.floor(Math.random() * 6);
             switch(bonusType){
                 case 0: item.bonusHP = Math.floor(statBase * 5) + 20; break;
                 case 1: item.bonusMP = Math.floor(statBase * 3) + 10; break;
@@ -1516,27 +1985,50 @@ for(let i=1; i<=3000; i++){
             item.bonusATK = (item.bonusATK || 0) + 20;
             item.bonusMP = (item.bonusMP || 0) + 50;
         }
+        // Garante pelo menos 3 atributos
+        if (!item.bonusHP) item.bonusHP = Math.floor(statBase * 3) + 15;
+        if (!item.bonusMP) item.bonusMP = Math.floor(statBase * 2) + 10;
+        if (!item.bonusATK) item.bonusATK = Math.floor(statBase / 3) + 1;
     } else if(tipo==='equip'){
         if(nomeItem.includes('Espada') || nomeItem.includes('Arma')){
             item.min = Math.floor(statBase * 2.5) + 10;
             item.max = item.min + Math.floor(statBase * 2) + 15;
-            item.elem = elems[Math.floor(Math.random()*elems.length)];
             item.crit = Math.floor(statBase) + 3;
+            item.bonusHP = Math.floor(statBase * 2) + 10;
+            item.bonusATK = Math.floor(statBase / 3) + 2;
         } else if(nomeItem.includes('Escudo') || nomeItem.includes('Defesa')){
             item.def = Math.floor(statBase * 2) + 10;
             item.bloco = Math.floor(statBase * 2.5) + 20;
             item.bonusHP = Math.floor(statBase * 2) + 15;
+            item.bonusDEF = Math.floor(statBase / 2) + 3;
         } else if(nomeItem.includes('Armadura') || nomeItem.includes('Proteção')){
             item.def = Math.floor(statBase * 2.5) + 15;
             item.bloco = Math.floor(statBase * 1.5) + 15;
             item.bonusHP = Math.floor(statBase * 4) + 30;
             item.bonusDEF = Math.floor(statBase / 2) + 5;
+            item.bonusMP = Math.floor(statBase) + 10;
         } else if(nomeItem.includes('Elmo') || nomeItem.includes('Capacete')){
             item.def = Math.floor(statBase * 1.2) + 5;
             item.bonusHP = Math.floor(statBase * 2) + 15;
             item.bonusMP = Math.floor(statBase) + 10;
             item.bonusDEF = Math.floor(statBase / 3) + 2;
+        } else {
+            // Tipo genérico de equipamento - GARANTE ATRIBUTOS
+            item.def = Math.floor(statBase) + 3;
+            item.bonusHP = Math.floor(statBase * 1.5) + 10;
+            item.bonusMP = Math.floor(statBase) + 5;
+            item.bonusATK = Math.floor(statBase / 4) + 1;
         }
+    } else if(tipo==='consum'){
+        // Itens consumíveis sempre têm atributos
+        item.heal = Math.floor(statBase * 3) + 50;
+        item.bonusHP = Math.floor(statBase) + 10;
+        item.descricao = 'Item consumível de uso único';
+    } else {
+        // Para qualquer outro tipo - GARANTE ATRIBUTOS
+        item.def = Math.floor(statBase) + 2;
+        item.bonusHP = Math.floor(statBase * 1.2) + 8;
+        item.bonusMP = Math.floor(statBase) + 3;
     }
     
     // Adiciona descrição para itens lendários
@@ -1545,6 +2037,20 @@ for(let i=1; i<=3000; i++){
         item.bonusATK = (item.bonusATK || 0) + 30;
         item.bonusHP = (item.bonusHP || 0) + 150;
         item.bonusMP = (item.bonusMP || 0) + 80;
+        item.crit = (item.crit || 0) + 10;
+        item.bloco = (item.bloco || 0) + 15;
+    }
+    
+    // GARANTIR que o item tenha pelo menos 2 atributos visíveis
+    const atributosContagem = [
+        item.min, item.max, item.crit, item.def, item.bloco, item.bonusHP,
+        item.bonusMP, item.bonusATK, item.bonusDEF, item.bonusCRIT, item.bonusBLOCO, item.heal
+    ].filter(attr => attr !== undefined && attr !== null && attr !== 0).length;
+    
+    if (atributosContagem < 2) {
+        // Adiciona atributos automáticos se necessário
+        item.bonusHP = Math.floor(statBase) + 10;
+        item.bonusMP = Math.floor(statBase / 2) + 5;
     }
     
     itens.push(item);
@@ -2414,7 +2920,7 @@ function equiparItemDoInventario(id) {
             statsRemovidos.bloco = itemRemovido.bloco || 0;
         }
     } else {
-        alert('Este item não pode ser equipado.');
+        adicionarNotificacao('Este item não pode ser equipado.', 'warning');
         return;
     }
 
@@ -2469,7 +2975,7 @@ function descartarItemDoInventario(id) {
             (heroi.equipAmulet && heroi.equipAmulet.id === id);
         
         if (isEquipped) {
-            alert('Não é possível descartar um item que está equipado! Desequipe-o primeiro.');
+            adicionarNotificacao('Não é possível descartar um item que está equipado! Desequipe-o primeiro.', 'warning');
             return;
         }
         
@@ -2528,160 +3034,103 @@ function verificarRebirth() {
         heroi.def = 5 + (heroi.baseDefBonus || 0);
         heroi.crit = 3 + (heroi.baseCritBonus || 0);
         
-        alert(`🎉 REBIRTH COMPLETO! 🎉\n\nVocê agora tem:\n• ${heroi.rebirthCount} rebirth(s)\n• +${heroi.baseAtkBonus} ATK permanente\n• +${heroi.baseDefBonus} DEF permanente\n• +${heroi.baseCritBonus.toFixed(1)}% CRIT permanente\n• XP Multiplier: ${heroi.xpMultiplier}x`);
+        adicionarNotificacao(`🎉 REBIRTH COMPLETO! Você agora tem ${heroi.rebirthCount} rebirth(s)!`, 'important');
         
         atualizarStatus();
     }
 }
 
-function atacar() {
-    if(!inimigoAtual) return;
+// ========================
+// FUNÇÃO CORRIGIDA PARA USAR POÇÃO
+// ========================
+
+function usarPocao() {
+    // Procura por poções de cura no inventário
+    const pocaoIndex = heroi.inventory.findIndex(i => 
+        (i.nome && i.nome.includes('Poção') && i.tipo === 'consum' && i.heal) ||
+        (i.id && i.id.includes('pocao'))
+    );
     
-    const chanceBloco = heroi.bloco / 100;
-    const isBloqueado = Math.random() < chanceBloco;
+    if(pocaoIndex === -1){
+        adicionarNotificacao('Você não tem poções de cura no inventário.', 'warning');
+        return;
+    }
+
+    const pocao = heroi.inventory[pocaoIndex];
+
+    if(heroi.hp >= heroi.maxHp){
+        adicionarNotificacao('Seu HP já está no máximo!', 'warning');
+        return;
+    }
+
+    const curaAntes = heroi.hp;
+    const curaReal = Math.min(pocao.heal || 100, heroi.maxHp - heroi.hp);
+    heroi.hp += curaReal;
     
-    let danoHeroi = 0;
-    let mensagemAtaque = "";
-    
-    if (isBloqueado) {
-        mostrarNotificacao("🛡️ ATAQUE BLOQUEADO!");
-        mensagemAtaque = `${inimigoAtual.nome} bloqueou seu ataque!`;
-    } else {
-        const ataqueHeroi = heroi.atk;
-        const defesaInimigo = parseInt(inimigoAtual.def) || 0;
-        danoHeroi = calcularDano(ataqueHeroi, defesaInimigo, heroi.lv);
-        
-        const chanceCrit = (heroi.crit || 0) / 100;
-        const isCritico = Math.random() < chanceCrit;
-        
-        if (isCritico) {
-            danoHeroi = Math.floor(danoHeroi * 1.5);
-            mostrarNotificacao("🎯 CRÍTICO!");
-            mensagemAtaque = `Você causou ${danoHeroi} de dano CRÍTICO em ${inimigoAtual.nome}!`;
-        } else {
-            mensagemAtaque = `Você causou ${danoHeroi} de dano em ${inimigoAtual.nome}.`;
-        }
-        
-        inimigoAtual.hp -= danoHeroi;
-        if(inimigoAtual.hp < 0) inimigoAtual.hp = 0;
+    // Encontra o botão "Usar Poção" para posicionar a animação
+    const btnUsarPocao = document.getElementById('btnUsarPocao');
+    if (btnUsarPocao) {
+        // ANIMAÇÃO VERDE PARA CURA - aparecendo no botão da poção
+        mostrarAnimacaoDano(curaReal, '', btnUsarPocao, false, false, true);
     }
     
-    document.getElementById('enemyHP').textContent = `${inimigoAtual.hp}/${inimigoAtual.hpMax}`;
+    // Decrementa a quantidade ou remove do inventário
+    if (pocao.quantidade && pocao.quantidade > 1) {
+        pocao.quantidade--;
+    } else {
+        heroi.inventory.splice(pocaoIndex, 1);
+    }
     
-    alert(mensagemAtaque);
-    
-    if(inimigoAtual.hp <= 0){
-        alert(`Inimigo ${inimigoAtual.nome} derrotado!`);
-        const ouroGanhos = Math.floor(Math.random()*(inimigoAtual.gold[1]-inimigoAtual.gold[0]+1))+inimigoAtual.gold[0];
-        heroi.gold += ouroGanhos;
-        
-        // XP com multiplicador de rebirth
-        const xpBase = Math.floor((10 + Math.floor(Math.random() * 10)) * (1 + heroi.lv * 0.001));
-        const xpGanhos = Math.floor(xpBase * (heroi.xpMultiplier || 1));
-        heroi.xp += xpGanhos;
-        
-        let mensagemRecompensa = `Ganhou ${ouroGanhos} ouro e ${xpGanhos} XP!`;
+    adicionarNotificacao(`Você usou uma ${pocao.nome} e recuperou ${curaReal} HP.`);
+    atualizarStatus();
+    atualizarInventario();
+    salvarNoLocalStorage();
+}
 
-        // Drop de itens
-        if (inimigoAtual.drops && inimigoAtual.drops.length > 0) {
-            for(const [itemName, dropChance] of inimigoAtual.drops){
-                if (Math.random() < dropChance) {
-                    const itemDrop = ITEMS.find(i => i.nome === itemName);
-                    if (itemDrop) {
-                        let invItem = heroi.inventory.find(i=>i.id===itemDrop.id);
-                        if(invItem){
-                            invItem.quantidade = (invItem.quantidade || 1) + 1;
-                        } else {
-                            heroi.inventory.push({ ...itemDrop, quantidade:1 });
-                        }
-                        
-                        const isBossItem = itemDrop.id.includes('boss_item');
-                        if (isBossItem) {
-                            mensagemRecompensa += `\n\n🎉 VOCÊ ENCONTROU UM ITEM RARO! 🎉\n${itemDrop.nome}`;
-                            if (itemDrop.descricao) {
-                                mensagemRecompensa += `\n${itemDrop.descricao}`;
-                            }
-                            mensagemRecompensa += `\n\nStatus do item:`;
-                            if (itemDrop.bonusHP) mensagemRecompensa += `\n• +${itemDrop.bonusHP} HP`;
-                            if (itemDrop.bonusMP) mensagemRecompensa += `\n• +${itemDrop.bonusMP} MP`;
-                            if (itemDrop.bonusATK) mensagemRecompensa += `\n• +${itemDrop.bonusATK} ATK`;
-                            if (itemDrop.bonusDEF) mensagemRecompensa += `\n• +${itemDrop.bonusDEF} DEF`;
-                            if (itemDrop.bonusCRIT) mensagemRecompensa += `\n• +${itemDrop.bonusCRIT}% CRIT`;
-                            if (itemDrop.bonusBLOCO) mensagemRecompensa += `\n• +${itemDrop.bonusBLOCO}% BLOCO`;
-                            
-                            mostrarNotificacao(`🎁 ITEM RARO ENCONTRADO: ${itemDrop.nome}!`);
-                        } else {
-                            mostrarNotificacao(`Você recebeu: ${itemDrop.nome}!`);
-                        }
-                    }
-                }
-            }
-        }
+// ========================
+// FUNÇÃO CORRIGIDA PARA USAR POÇÃO ESPECÍFICA
+// ========================
 
-        // Subir de nível com escalonamento para níveis altos
-        const xpNecessaria = heroi.lv * 50 * (1 + Math.floor(heroi.lv / 100) * 0.5);
-        if(heroi.xp >= xpNecessaria) {
-            heroi.lv++;
-            heroi.xp -= xpNecessaria;
-            
-            heroi.maxHp += 10 + Math.floor(heroi.lv / 50);
-            heroi.hp = heroi.maxHp;
-            heroi.maxMp += 5 + Math.floor(heroi.lv / 100);
-            heroi.mp = heroi.maxMp;
-            
-            heroi.atk += 1 + Math.floor(heroi.lv / 200);
-            heroi.def += 1 + Math.floor(heroi.lv / 200);
-            heroi.crit += 0.5 + (Math.floor(heroi.lv / 500) * 0.1);
-            
-            if (heroi.lv > 10000) {
-                heroi.lv = 10000;
-            }
-            
-            mensagemRecompensa += `\n\n🏆 Parabéns! Você subiu para o nível ${heroi.lv}!`;
-            mensagemRecompensa += `\nStatus aumentados: ATK +${1 + Math.floor(heroi.lv / 200)}, DEF +${1 + Math.floor(heroi.lv / 200)}, CRIT +${(0.5 + (Math.floor(heroi.lv / 500) * 0.1)).toFixed(1)}%`;
-            
-            // Verifica se pode fazer rebirth
-            if (heroi.lv >= 1000 && heroi.lv % 100 === 0) {
-                setTimeout(verificarRebirth, 1000);
-            }
-        }
-        
-        alert(mensagemRecompensa);
-        atualizarInventario();
-        atualizarStatus();
-        salvarNoLocalStorage();
-
-        inimigoAtual=null;
-        document.getElementById('enemyIcon').textContent='?';
-        document.getElementById('enemyNome').textContent='Nenhum inimigo';
-        document.getElementById('enemyHP').textContent='0/0';
-        document.getElementById('enemyMaxHP').textContent='0';
-        document.getElementById('btnAtacar').disabled=true;
-        document.getElementById('btnSair').disabled = true;
+function usarPocaoEspecifica(id) {
+    const pocaoIndex = heroi.inventory.findIndex(i => i.id === id && i.tipo === 'consum' && i.heal);
+    if(pocaoIndex === -1){
+        adicionarNotificacao('Poção não encontrada no inventário.', 'warning');
         return;
     }
     
-    if (!isBloqueado) {
-        const ataqueInimigo = parseInt(inimigoAtual.atk) || 5;
-        const defesaHeroi = parseInt(heroi.def) || 5;
-        const danoInimigo = calcularDano(ataqueInimigo, defesaHeroi, Math.max(1, heroi.lv/10));
-        
-        heroi.hp -= danoInimigo;
-        if(heroi.hp < 0) heroi.hp = 0;
-        
-        alert(`${inimigoAtual.nome} contra-atacou e causou ${danoInimigo} de dano em você!`);
-        
-        if(heroi.hp <= 0){
-            alert('Você foi derrotado! Recuperando HP e MP...');
-            heroi.hp = heroi.maxHp;
-            heroi.mp = heroi.maxMp;
-            atualizarStatus();
-            salvarNoLocalStorage();
-            return;
+    const pocao = heroi.inventory[pocaoIndex];
+    
+    if(heroi.hp >= heroi.maxHp){
+        adicionarNotificacao('Seu HP já está no máximo!', 'warning');
+        return;
+    }
+    
+    const curaAntes = heroi.hp;
+    const curaReal = Math.min(pocao.heal, heroi.maxHp - heroi.hp);
+    heroi.hp += curaReal;
+    
+    // Encontra o botão específico da poção no inventário
+    const btnUsarEspecifico = document.querySelector(`button[onclick*="${id}"]`);
+    if (btnUsarEspecifico) {
+        // ANIMAÇÃO VERDE PARA CURA - aparecendo no botão da poção específica
+        mostrarAnimacaoDano(curaReal, '', btnUsarEspecifico, false, false, true);
+    } else {
+        // Fallback para o botão geral de poção
+        const btnUsarPocao = document.getElementById('btnUsarPocao');
+        if (btnUsarPocao) {
+            mostrarAnimacaoDano(curaReal, '', btnUsarPocao, false, false, true);
         }
     }
     
+    if (pocao.quantidade && pocao.quantidade > 1) {
+        pocao.quantidade--;
+    } else {
+        heroi.inventory.splice(pocaoIndex, 1);
+    }
+    
+    adicionarNotificacao(`Você usou uma ${pocao.nome} e recuperou ${curaReal} HP.`);
     atualizarStatus();
+    atualizarInventario();
     salvarNoLocalStorage();
 }
 
@@ -2714,6 +3163,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     inicializarBackup();
+    inicializarNotificacoes();
     
     const backupModal = document.getElementById('backupModal');
     backupModal.addEventListener('click', function(e) {
@@ -2750,45 +3200,94 @@ Object.assign(heroi, p);
 }
 }
 
-// ========================
-// Funções de notificação
-function mostrarNotificacao(mensagem) {
-const notification = document.getElementById('notification');
-notification.textContent = mensagem;
-notification.style.opacity = '1';
-setTimeout(() => {
-notification.style.opacity = '0';
-}, 3000);
+// ==========================================================
+// FUNÇÕES DE EXIBIÇÃO DE ITENS (COM ATRIBUTOS VISÍVEIS)
+// ==========================================================
+
+function gerarAtributosParaItem(item) {
+    const atributos = [];
+    
+    // Adiciona atributos baseados no tipo de item
+    if (item.min && item.max) atributos.push(`${item.min}-${item.max} ATK`);
+    if (item.crit) atributos.push(`${item.crit}% CRIT`);
+    if (item.def) atributos.push(`${item.def} DEF`);
+    if (item.bloco) atributos.push(`${item.bloco}% BLOCO`);
+    if (item.elem) atributos.push(`${item.elem}`);
+    if (item.bonusHP) atributos.push(`${item.bonusHP} HP`);
+    if (item.bonusMP) atributos.push(`${item.bonusMP} MP`);
+    if (item.bonusATK) atributos.push(`${item.bonusATK} B-ATK`);
+    if (item.bonusDEF) atributos.push(`${item.bonusDEF} B-DEF`);
+    if (item.bonusCRIT) atributos.push(`${item.bonusCRIT}% B-CRIT`);
+    if (item.bonusBLOCO) atributos.push(`${item.bonusBLOCO}% B-BLOCO`);
+    if (item.heal) atributos.push(`${item.heal} CURA`);
+    
+    // Se não tiver atributos suficientes, gera alguns baseados no preço
+    if (atributos.length < 2) {
+        const baseVal = Math.floor(Math.pow(item.preco, 1/3.5));
+        
+        // Gera atributos automáticos baseados no tipo
+        if (item.tipo === 'arma' || item.tipo === 'equip') {
+            if (!item.min && !item.max) {
+                const atk = Math.floor(baseVal * 1.5) + 3;
+                atributos.push(`${atk} ATK`);
+            }
+            if (!item.crit) {
+                const crit = Math.floor(baseVal / 2) + 1;
+                if (crit > 0) atributos.push(`${crit}% CRIT`);
+            }
+        } else if (item.tipo === 'off') {
+            if (!item.def) {
+                const def = Math.floor(baseVal) + 2;
+                atributos.push(`${def} DEF`);
+            }
+            if (!item.bloco) {
+                const bloco = Math.floor(baseVal / 2) + 3;
+                if (bloco > 0) atributos.push(`${bloco}% BLOCO`);
+            }
+        } else if (item.tipo === 'amu') {
+            const hp = Math.floor(baseVal * 2) + 10;
+            const mp = Math.floor(baseVal) + 5;
+            atributos.push(`${hp} HP`);
+            atributos.push(`${mp} MP`);
+        } else if (item.tipo === 'consum') {
+            if (!item.heal) {
+                const heal = Math.floor(baseVal * 3) + 50;
+                atributos.push(`${heal} CURA`);
+            }
+        }
+        
+        // Adiciona atributos genéricos se ainda estiver faltando
+        if (atributos.length < 2) {
+            const hpBonus = Math.floor(baseVal * 1.2) + 8;
+            const mpBonus = Math.floor(baseVal * 0.8) + 3;
+            atributos.push(`${hpBonus} HP`);
+            atributos.push(`${mpBonus} MP`);
+        }
+    }
+    
+    return atributos;
 }
 
-// ==========================================================
-// FUNÇÕES DE EXIBIÇÃO DE ITENS (COM ATRIBUTOS)
-// ==========================================================
-
-function formatarAtributos(item) {
-    let html = '';
-    const stats = [];
-
-    if (item.min && item.max) stats.push(`ATK: ${item.min}-${item.max}`);
-    if (item.crit) stats.push(`CRIT: +${item.crit}%`);
-    if (item.def) stats.push(`DEF: +${item.def}`);
-    if (item.bloco) stats.push(`BLOCO: +${item.bloco}%`);
-    if (item.elem) stats.push(`Elemento: ${item.elem}`);
-    if (item.bonusHP) stats.push(`HP: +${item.bonusHP}`);
-    if (item.bonusMP) stats.push(`MP: +${item.bonusMP}`);
-    if (item.bonusATK) stats.push(`ATK: +${item.bonusATK}`);
-    if (item.bonusDEF) stats.push(`DEF: +${item.bonusDEF}`);
-    if (item.bonusCRIT) stats.push(`CRIT: +${item.bonusCRIT}%`);
-    if (item.bonusBLOCO) stats.push(`BLOCO: +${item.bonusBLOCO}%`);
-    if (item.heal) stats.push(`Cura: ${item.heal} HP`);
+function formatarAtributosVisiveis(item) {
+    // Garante que o item tenha atributos
+    const atributos = gerarAtributosParaItem(item);
     
+    let html = `<div class="item-attributes">`;
+    
+    // Limita a 4 atributos para não ficar muito longo
+    atributos.slice(0, 4).forEach(attr => {
+        html += `<span class="attr-badge">${attr}</span>`;
+    });
+    
+    // Adiciona indicador se for item raro ou lendário
     if (item.id && item.id.includes('boss_item')) {
-        stats.push('✨ RARO');
+        html += `<span class="attr-badge" style="background: rgba(212, 167, 97, 0.3); border-color: var(--accent);">✨ RARO</span>`;
     }
-
-    if (stats.length > 0) {
-        html = `<span style="font-size: 12px; color: var(--muted); margin-left: 10px;">(${stats.slice(0, 3).join(' | ')})</span>`;
+    if (item.preco > 5000000) {
+        html += `<span class="attr-badge" style="background: rgba(255, 215, 0, 0.2); border-color: gold;">👑 LENDÁRIO</span>`;
     }
+    
+    html += `</div>`;
     return html;
 }
 
@@ -2802,17 +3301,21 @@ function mostrarItens() {
     const itensNaPagina = itensOrdenados.slice(inicio, fim);
 
     for(let item of itensNaPagina){
-        const statsHtml = formatarAtributos(item);
+        const statsHtml = formatarAtributosVisiveis(item);
         const isBossItem = item.id && item.id.includes('boss_item');
         const isLendario = item.preco > 5000000;
         const itemStyle = isBossItem ? 'border: 2px solid var(--accent); background: rgba(212, 167, 97, 0.1);' : 
                          isLendario ? 'border: 2px solid gold; background: rgba(255, 215, 0, 0.05);' : '';
         const precoColor = isLendario ? 'color: gold; font-weight: bold;' : '';
         
-        container.innerHTML += `<div class="item-entry" style="display:flex; justify-content:space-between; align-items:center; padding:4px; border-bottom:1px solid #555; ${itemStyle}">
+        container.innerHTML += `<div class="item-entry" style="display:flex; justify-content:space-between; align-items:center; padding:8px; border-bottom:1px solid #555; ${itemStyle}">
             <div class="item-info">
-                <b>${item.nome}</b> ${isBossItem ? '✨' : ''}${isLendario ? ' 👑' : ''} (${item.tipo}) ${statsHtml}<br>
-                <span style="${precoColor}">Preço: PO ${item.preco.toLocaleString()}</span>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <b>${item.nome}</b> ${isBossItem ? '✨' : ''}${isLendario ? ' 👑' : ''} 
+                    <span style="font-size: 12px; color: var(--muted);">(${item.tipo})</span>
+                </div>
+                ${statsHtml}
+                <div style="${precoColor} margin-top: 4px;">Preço: <b>PO ${item.preco.toLocaleString()}</b></div>
             </div>
             <button class="buttonnn" onclick="comprarItem('${item.id}')">Comprar</button>
         </div>`;
@@ -2848,7 +3351,7 @@ function comprarItem(id) {
 const item = ITEMS.find(i=>i.id===id);
 if(!item) return;
 if(heroi.gold < item.preco){
-alert('Ouro insuficiente para comprar este item.');
+adicionarNotificacao('Ouro insuficiente para comprar este item.', 'warning');
 return;
 }
 heroi.gold -= item.preco;
@@ -2862,34 +3365,43 @@ heroi.inventory.push({ ...item, quantidade:1 });
 const isBossItem = item.id && item.id.includes('boss_item');
 const isLendario = item.preco > 5000000;
 if (isBossItem) {
-    alert(`🎉 VOCÊ COMPROU UM ITEM RARO!\n${item.nome}\n\nEste item concede poderes extraordinários!`);
+    adicionarNotificacao(`🎉 VOCÊ COMPROU UM ITEM RARO: ${item.nome}!`, 'important');
 } else if (isLendario) {
-    alert(`👑 VOCÊ COMPROU UM ITEM LENDÁRIO!\n${item.nome}\n\nPreço: ${item.preco.toLocaleString()} PO\n\nPoder incomparável!`);
+    adicionarNotificacao(`👑 VOCÊ COMPROU UM ITEM LENDÁRIO: ${item.nome}!`, 'important');
 } else {
-    alert(`Você comprou: ${item.nome}`);
+    adicionarNotificacao(`Você comprou: ${item.nome}`);
 }
 
 atualizarInventario();
 atualizarStatus();
 }
 
-// 2. Atualizar inventário
+// 2. Atualizar inventário COM BOTÕES DE USAR POÇÃO ESPECÍFICA
 function atualizarInventario() {
     const div = document.getElementById('inventory');
     div.innerHTML='';
     heroi.inventory.forEach(i => {
-        const statsHtml = formatarAtributos(i);
+        const statsHtml = formatarAtributosVisiveis(i);
         const isBossItem = i.id && i.id.includes('boss_item');
         const isLendario = i.preco > 5000000;
+        const isConsumivel = i.tipo === 'consum' && i.heal;
         const itemStyle = isBossItem ? 'border-left: 3px solid var(--accent); padding-left: 5px;' : 
                          isLendario ? 'border-left: 3px solid gold; padding-left: 5px;' : '';
         
         let itemHtml = `<div style="display: flex; justify-content: space-between; align-items: center; ${itemStyle}">
-            <div><b>${i.nome}</b> ${isBossItem ? '✨' : ''}${isLendario ? ' 👑' : ''} x${i.quantidade} ${statsHtml}</div>
+            <div style="flex-grow: 1;">
+                <div><b>${i.nome}</b> ${isBossItem ? '✨' : ''}${isLendario ? ' 👑' : ''} x${i.quantidade}</div>
+                ${statsHtml}
+            </div>
             <div>`;
         
         if (i.isEquipavel) {
             itemHtml += `<button class="equip-btn" onclick="equiparItemDoInventario('${i.id}')">Equipar</button>`;
+        }
+        
+        // Adiciona botão de usar para poções
+        if (isConsumivel) {
+            itemHtml += `<button class="equip-btn" style="background: #a3bf3f !important;" onclick="usarPocaoEspecifica('${i.id}')">Usar</button>`;
         }
         
         itemHtml += `<button class="desequip-btn" onclick="descartarItemDoInventario('${i.id}')" style="margin-left: 5px;">🗑️</button>`;
@@ -2897,54 +3409,6 @@ function atualizarInventario() {
         itemHtml += `</div></div>`;
         div.innerHTML += itemHtml;
     });
-}
-
-function usarPocaoEspecifica(id) {
-    const pocaoIndex = heroi.inventory.findIndex(i => i.id === id && i.tipo === 'consum' && i.heal);
-    if(pocaoIndex === -1){
-        alert('Poção não encontrada no inventário.');
-        return;
-    }
-    
-    const pocao = heroi.inventory[pocaoIndex];
-    
-    if(heroi.hp >= heroi.maxHp){
-        alert('Seu HP já está no máximo!');
-        return;
-    }
-    
-    heroi.hp = Math.min(heroi.maxHp, heroi.hp + pocao.heal);
-    
-    pocao.quantidade--;
-    if(pocao.quantidade <= 0){
-        heroi.inventory.splice(pocaoIndex, 1);
-    }
-    
-    alert(`Você usou uma ${pocao.nome} e recuperou ${pocao.heal} HP. HP atual: ${heroi.hp}/${heroi.maxHp}`);
-    atualizarStatus();
-}
-
-function usarPocao() {
-const pocaoIndex = heroi.inventory.findIndex(i => i.nome.includes('Poção') && i.tipo === 'consum');
-if(pocaoIndex === -1){
-alert('Você não tem poções de HP no inventário.');
-return;
-}
-
-const pocao = heroi.inventory[pocaoIndex];
-
-if(heroi.hp >= heroi.maxHp){
-    alert('Seu HP já está no máximo!');
-    return;
-}
-
-heroi.hp = Math.min(heroi.maxHp, heroi.hp + pocao.heal);
-pocao.quantidade--;
-if(pocao.quantidade <= 0){
-heroi.inventory.splice(pocaoIndex, 1);
-}
-alert(`Você usou uma poção e recuperou ${pocao.heal} HP. HP atual: ${heroi.hp}/${heroi.maxHp}`);
-atualizarStatus();
 }
 
 // ========================
@@ -2963,7 +3427,7 @@ function encontrarInimigo() {
         inimigoAtual.def = Math.floor(inimigoAtual.def * multiplicadorNivel);
         
         inimigoAtual.hpMax = inimigoAtual.hp;
-        mostrarNotificacao(`🚨 UM CHEFE APARECEU: ${boss.nome}! 🚨`);
+        adicionarNotificacao(`🚨 UM CHEFE APARECEU: ${boss.nome}! 🚨`, 'important');
     } else {
         const inim = ENEMIES[Math.floor(Math.random() * ENEMIES.length)];
         inimigoAtual = { ...inim };
@@ -2998,15 +3462,159 @@ function sairDoCombate() {
 
     cutsceneVideo.onended = function() {
         window.close();
-        
-        alert('O jogo será reiniciado. Fim da cutscene!');
         location.reload(); 
     };
 
     cutsceneVideo.play().catch(error => {
-        alert('Falha ao iniciar a cutscene. Clique em OK para reiniciar o jogo.');
-        location.reload();
+        adicionarNotificacao('Falha ao iniciar a cutscene. O jogo será reiniciado.', 'warning');
+        setTimeout(() => location.reload(), 1000);
     });
+}
+
+// ========================
+// ATUALIZAÇÃO DAS FUNÇÕES QUE USAM ANIMAÇÃO
+// ========================
+
+function atacar() {
+    if(!inimigoAtual) return;
+    
+    const chanceBloco = heroi.bloco / 100;
+    const isBloqueado = Math.random() < chanceBloco;
+    
+    let danoHeroi = 0;
+    
+    if (isBloqueado) {
+        adicionarNotificacao("🛡️ ATAQUE BLOQUEADO!", 'important');
+        // Animação de bloqueado no inimigo
+        mostrarAnimacaoDano(0, 'enemy', document.getElementById('enemyDisplay'), false, true);
+    } else {
+        const ataqueHeroi = heroi.atk;
+        const defesaInimigo = parseInt(inimigoAtual.def) || 0;
+        danoHeroi = calcularDano(ataqueHeroi, defesaInimigo, heroi.lv);
+        
+        const chanceCrit = (heroi.crit || 0) / 100;
+        const isCritico = Math.random() < chanceCrit;
+        
+        if (isCritico) {
+            danoHeroi = Math.floor(danoHeroi * 1.5);
+            adicionarNotificacao("🎯 CRÍTICO!", 'important');
+        }
+        
+        inimigoAtual.hp -= danoHeroi;
+        if(inimigoAtual.hp < 0) inimigoAtual.hp = 0;
+        
+        // Animação de dano VERMELHA no inimigo
+        mostrarAnimacaoDano(danoHeroi, 'enemy', document.getElementById('enemyDisplay'), isCritico, false);
+        
+        let mensagemDano = isCritico ? 
+            `Você causou ${danoHeroi} de dano CRÍTICO em ${inimigoAtual.nome}!` :
+            `Você causou ${danoHeroi} de dano em ${inimigoAtual.nome}.`;
+        adicionarNotificacao(mensagemDano);
+    }
+    
+    document.getElementById('enemyHP').textContent = `${inimigoAtual.hp}/${inimigoAtual.hpMax}`;
+    
+    if(inimigoAtual.hp <= 0){
+        const ouroGanhos = Math.floor(Math.random()*(inimigoAtual.gold[1]-inimigoAtual.gold[0]+1))+inimigoAtual.gold[0];
+        heroi.gold += ouroGanhos;
+        
+        // XP com multiplicador de rebirth
+        const xpBase = Math.floor((10 + Math.floor(Math.random() * 10)) * (1 + heroi.lv * 0.001));
+        const xpGanhos = Math.floor(xpBase * (heroi.xpMultiplier || 1));
+        heroi.xp += xpGanhos;
+        
+        adicionarNotificacao(`🎉 Inimigo ${inimigoAtual.nome} derrotado! Ganhou ${ouroGanhos} ouro e ${xpGanhos} XP!`, 'important');
+
+        // Drop de itens
+        if (inimigoAtual.drops && inimigoAtual.drops.length > 0) {
+            for(const [itemName, dropChance] of inimigoAtual.drops){
+                if (Math.random() < dropChance) {
+                    const itemDrop = ITEMS.find(i => i.nome === itemName);
+                    if (itemDrop) {
+                        let invItem = heroi.inventory.find(i=>i.id===itemDrop.id);
+                        if(invItem){
+                            invItem.quantidade = (invItem.quantidade || 1) + 1;
+                        } else {
+                            heroi.inventory.push({ ...itemDrop, quantidade:1 });
+                        }
+                        
+                        const isBossItem = itemDrop.id.includes('boss_item');
+                        if (isBossItem) {
+                            adicionarNotificacao(`🎁 VOCÊ ENCONTROU UM ITEM RARO: ${itemDrop.nome}!`, 'important');
+                        } else {
+                            adicionarNotificacao(`Você recebeu: ${itemDrop.nome}!`);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Subir de nível com escalonamento para níveis altos
+        const xpNecessaria = heroi.lv * 50 * (1 + Math.floor(heroi.lv / 100) * 0.5);
+        if(heroi.xp >= xpNecessaria) {
+            heroi.lv++;
+            heroi.xp -= xpNecessaria;
+            
+            heroi.maxHp += 10 + Math.floor(heroi.lv / 50);
+            heroi.hp = heroi.maxHp;
+            heroi.maxMp += 5 + Math.floor(heroi.lv / 100);
+            heroi.mp = heroi.maxMp;
+            
+            heroi.atk += 1 + Math.floor(heroi.lv / 200);
+            heroi.def += 1 + Math.floor(heroi.lv / 200);
+            heroi.crit += 0.5 + (Math.floor(heroi.lv / 500) * 0.1);
+            
+            if (heroi.lv > 10000) {
+                heroi.lv = 10000;
+            }
+            
+            adicionarNotificacao(`🏆 Parabéns! Você subiu para o nível ${heroi.lv}!`, 'important');
+            
+            // Verifica se pode fazer rebirth
+            if (heroi.lv >= 1000 && heroi.lv % 100 === 0) {
+                setTimeout(verificarRebirth, 1000);
+            }
+        }
+        
+        atualizarInventario();
+        atualizarStatus();
+        salvarNoLocalStorage();
+
+        inimigoAtual=null;
+        document.getElementById('enemyIcon').textContent='?';
+        document.getElementById('enemyNome').textContent='Nenhum inimigo';
+        document.getElementById('enemyHP').textContent='0/0';
+        document.getElementById('enemyMaxHP').textContent='0';
+        document.getElementById('btnAtacar').disabled=true;
+        document.getElementById('btnSair').disabled = true;
+        return;
+    }
+    
+    if (!isBloqueado) {
+        const ataqueInimigo = parseInt(inimigoAtual.atk) || 5;
+        const defesaHeroi = parseInt(heroi.def) || 5;
+        const danoInimigo = calcularDano(ataqueInimigo, defesaHeroi, Math.max(1, heroi.lv/10));
+        
+        heroi.hp -= danoInimigo;
+        if(heroi.hp < 0) heroi.hp = 0;
+        
+        // REMOVIDO: animação de dano no jogador (azul)
+        // mostrarAnimacaoDano(danoInimigo, 'player', document.getElementById('lutaSistema'), false, false);
+        
+        adicionarNotificacao(`${inimigoAtual.nome} contra-atacou e causou ${danoInimigo} de dano em você!`, 'warning');
+        
+        if(heroi.hp <= 0){
+            adicionarNotificacao('💀 Você foi derrotado! Recuperando HP e MP...', 'warning');
+            heroi.hp = heroi.maxHp;
+            heroi.mp = heroi.maxMp;
+            atualizarStatus();
+            salvarNoLocalStorage();
+            return;
+        }
+    }
+    
+    atualizarStatus();
+    salvarNoLocalStorage();
 }
 
 // ========================
@@ -3038,17 +3646,17 @@ function atualizarStatus() {
     document.getElementById('blocoVal').textContent=heroi.bloco.toFixed(1)+'%';
 
     const weaponName = heroi.equipWeapon ? heroi.equipWeapon.nome : 'Nenhuma';
-    const weaponStats = heroi.equipWeapon ? formatarAtributos(heroi.equipWeapon) : '';
+    const weaponStats = heroi.equipWeapon ? formatarAtributosVisiveis(heroi.equipWeapon) : '';
     document.getElementById('eq-weapon').innerHTML = weaponName + ' ' + weaponStats;
     document.getElementById('btn-desequipar-weapon').style.display = heroi.equipWeapon ? 'inline-block' : 'none';
 
     const offhandName = heroi.equipOffhand ? heroi.equipOffhand.nome : 'Nenhum';
-    const offhandStats = heroi.equipOffhand ? formatarAtributos(heroi.equipOffhand) : '';
+    const offhandStats = heroi.equipOffhand ? formatarAtributosVisiveis(heroi.equipOffhand) : '';
     document.getElementById('eq-offhand').innerHTML = offhandName + ' ' + offhandStats;
     document.getElementById('btn-desequipar-offhand').style.display = heroi.equipOffhand ? 'inline-block' : 'none';
 
     const amuletName = heroi.equipAmulet ? heroi.equipAmulet.nome : 'Nenhum';
-    const amuletStats = heroi.equipAmulet ? formatarAtributos(heroi.equipAmulet) : '';
+    const amuletStats = heroi.equipAmulet ? formatarAtributosVisiveis(heroi.equipAmulet) : '';
     document.getElementById('eq-amulet').innerHTML = amuletName + ' ' + amuletStats;
     document.getElementById('btn-desequipar-amulet').style.display = heroi.equipAmulet ? 'inline-block' : 'none';
 
