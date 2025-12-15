@@ -2928,35 +2928,82 @@ function equiparItemDoInventario(id) {
 }
 
 // ========================
-// FUNÇÃO PARA DESCARTAR ITEM DO INVENTÁRIO
+// FUNÇÃO PARA DESCARTAR ITEM DO INVENTÁRIO - CORRIGIDA
 // ========================
 
 function descartarItemDoInventario(id) {
     const itemIndex = heroi.inventory.findIndex(i => i.id === id);
-    if (itemIndex === -1) return;
+    if (itemIndex === -1) {
+        adicionarNotificacao('Item não encontrado no inventário.', 'warning');
+        return;
+    }
     
     const item = heroi.inventory[itemIndex];
     
+    // Verifica se o item está equipado
+    const isEquipped = 
+        (heroi.equipWeapon && heroi.equipWeapon.id === id) ||
+        (heroi.equipOffhand && heroi.equipOffhand.id === id) ||
+        (heroi.equipAmulet && heroi.equipAmulet.id === id);
+    
+    if (isEquipped) {
+        adicionarNotificacao('Não é possível descartar um item que está equipado! Desequipe-o primeiro.', 'warning');
+        return;
+    }
+    
     if (confirm(`Tem certeza que deseja descartar "${item.nome}"?\n\nATENÇÃO: Este item será PERDIDO permanentemente!`)) {
-        const isEquipped = 
-            (heroi.equipWeapon && heroi.equipWeapon.id === id) ||
-            (heroi.equipOffhand && heroi.equipOffhand.id === id) ||
-            (heroi.equipAmulet && heroi.equipAmulet.id === id);
-        
-        if (isEquipped) {
-            adicionarNotificacao('Não é possível descartar um item que está equipado! Desequipe-o primeiro.', 'warning');
-            return;
-        }
-        
         if (item.quantidade && item.quantidade > 1) {
             item.quantidade--;
         } else {
             heroi.inventory.splice(itemIndex, 1);
         }
         
+        adicionarNotificacao(`Item "${item.nome}" descartado.`, 'normal');
         atualizarInventario();
         atualizarStatus();
         salvarNoLocalStorage();
+    }
+}
+
+// ========================
+// ATUALIZAÇÃO DA FUNÇÃO atualizarInventario() PARA SUPORTAR BOTÕES DE DESCARTAR
+// ========================
+
+function atualizarInventario() {
+    const div = document.getElementById('inventory');
+    div.innerHTML = '';
+    
+    heroi.inventory.forEach(i => {
+        const statsHtml = formatarAtributosVisiveis(i);
+        const isBossItem = i.id && i.id.includes('boss_item');
+        const isLendario = i.preco > 5000000;
+        const isConsumivel = i.tipo === 'consum' && i.heal;
+        const itemStyle = isBossItem ? 'border-left: 3px solid var(--accent); padding-left: 5px;' : 
+                         isLendario ? 'border-left: 3px solid gold; padding-left: 5px;' : '';
+        
+        const itemDiv = document.createElement('div');
+        itemDiv.style.cssText = `display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 8px; background: rgba(0,0,0,0.1); border-radius: 6px; ${itemStyle}`;
+        
+        const quantidade = i.quantidade || 1;
+        
+        itemDiv.innerHTML = `
+            <div style="flex-grow: 1;">
+                <div><b>${i.nome}</b> ${isBossItem ? '✨' : ''}${isLendario ? ' 👑' : ''} <span style="color: var(--accent);">x${quantidade}</span></div>
+                ${statsHtml}
+            </div>
+            <div style="display: flex; gap: 5px; align-items: center;">
+                ${i.isEquipavel ? `<button class="equip-btn" onclick="equiparItemDoInventario('${i.id}')">Equipar</button>` : ''}
+                ${isConsumivel ? `<button class="equip-btn" style="background: #a3bf3f !important;" onclick="usarPocaoEspecifica('${i.id}')">Usar</button>` : ''}
+                <button class="desequip-btn" onclick="descartarItemDoInventario('${i.id}')" style="margin-left: 5px;">🗑️</button>
+            </div>
+        `;
+        
+        div.appendChild(itemDiv);
+    });
+    
+    // Se não houver itens, mostra uma mensagem
+    if (heroi.inventory.length === 0) {
+        div.innerHTML = '<div style="text-align: center; color: var(--muted); padding: 20px;">Inventário vazio</div>';
     }
 }
 
@@ -3343,41 +3390,6 @@ if (isBossItem) {
 
 atualizarInventario();
 atualizarStatus();
-}
-
-// 2. Atualizar inventário COM BOTÕES DE USAR POÇÃO ESPECÍFICA
-function atualizarInventario() {
-    const div = document.getElementById('inventory');
-    div.innerHTML='';
-    heroi.inventory.forEach(i => {
-        const statsHtml = formatarAtributosVisiveis(i);
-        const isBossItem = i.id && i.id.includes('boss_item');
-        const isLendario = i.preco > 5000000;
-        const isConsumivel = i.tipo === 'consum' && i.heal;
-        const itemStyle = isBossItem ? 'border-left: 3px solid var(--accent); padding-left: 5px;' : 
-                         isLendario ? 'border-left: 3px solid gold; padding-left: 5px;' : '';
-        
-        let itemHtml = `<div style="display: flex; justify-content: space-between; align-items: center; ${itemStyle}">
-            <div style="flex-grow: 1;">
-                <div><b>${i.nome}</b> ${isBossItem ? '✨' : ''}${isLendario ? ' 👑' : ''} x${i.quantidade}</div>
-                ${statsHtml}
-            </div>
-            <div>`;
-        
-        if (i.isEquipavel) {
-            itemHtml += `<button class="equip-btn" onclick="equiparItemDoInventario('${i.id}')">Equipar</button>`;
-        }
-        
-        // Adiciona botão de usar para poções
-        if (isConsumivel) {
-            itemHtml += `<button class="equip-btn" style="background: #a3bf3f !important;" onclick="usarPocaoEspecifica('${i.id}')">Usar</button>`;
-        }
-        
-        itemHtml += `<button class="desequip-btn" onclick="descartarItemDoInventario('${i.id}')" style="margin-left: 5px;">🗑️</button>`;
-        
-        itemHtml += `</div></div>`;
-        div.innerHTML += itemHtml;
-    });
 }
 
 // ========================
