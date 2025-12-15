@@ -1435,7 +1435,7 @@ function mostrarAnimacaoDano(dano, tipo, elemento, isCritico = false, isBloquead
 }
 
 // ========================
-// Sistema de Backup
+// Sistema de Backup - CORRIGIDO (Importação Direta de Arquivo)
 // ========================
 
 let backups = [];
@@ -1472,11 +1472,6 @@ function abrirModalBackup(tipo) {
         input.placeholder = 'Nome do backup (opcional)';
         input.value = '';
         confirmBtn.onclick = confirmarCriarBackup;
-    } else if (tipo === 'importar') {
-        title.textContent = 'Importar Backup';
-        input.placeholder = 'Cole o código do backup aqui';
-        input.value = '';
-        confirmBtn.onclick = confirmarImportarBackup;
     }
     
     modal.classList.add('active');
@@ -1568,7 +1563,7 @@ function exportarBackup() {
     adicionarNotificacao('Backup exportado com sucesso!', 'important');
 }
 
-// Importar backup
+// Importar backup DE ARQUIVO JSON (CORRIGIDO)
 function importarBackup() {
     // Cria um input de arquivo oculto
     const fileInput = document.createElement('input');
@@ -1587,26 +1582,35 @@ function importarBackup() {
                 
                 // Validação do backup
                 if (!backupData.heroi || !backupData.heroi.nome) {
-                    throw new Error('Formato de backup inválido.');
+                    throw new Error('Formato de backup inválido. O arquivo deve conter dados do herói.');
                 }
                 
-                // Verifica limite de backups
-                if (backups.length >= MAX_BACKUPS) {
-                    adicionarNotificacao(`Limite de ${MAX_BACKUPS} backups atingido. Exclua um backup antigo primeiro.`, 'warning');
-                    return;
-                }
+                // Verifica se o backup é para adicionar à lista OU para restaurar diretamente
+                const opcao = prompt(
+                    `Backup encontrado: "${backupData.nome || 'Sem nome'}"\n` +
+                    `Nível: ${backupData.heroi.lv}\n` +
+                    `Ouro: ${backupData.heroi.gold}\n\n` +
+                    'Escolha uma opção:\n' +
+                    '1. Adicionar à lista de backups\n' +
+                    '2. Restaurar este backup AGORA (sobrescreve progresso atual)\n\n' +
+                    'Digite 1 ou 2:'
+                );
                 
-                // Prepara o backup para salvar
-                const novoBackup = {
-                    id: Date.now(),
-                    nome: backupData.nome || `Backup Importado ${new Date().toLocaleDateString()}`,
-                    data: backupData.data || new Date().toLocaleString('pt-BR'),
-                    heroi: backupData.heroi,
-                    version: backupData.version || '1.0'
-                };
-                
-                // Confirmação antes de importar
-                if (confirm(`Deseja importar o backup "${novoBackup.nome}"?\nNível: ${novoBackup.heroi.lv}\nOuro: ${novoBackup.heroi.gold}`)) {
+                if (opcao === '1') {
+                    // Adicionar à lista de backups
+                    if (backups.length >= MAX_BACKUPS) {
+                        adicionarNotificacao(`Limite de ${MAX_BACKUPS} backups atingido. Exclua um backup antigo primeiro.`, 'warning');
+                        return;
+                    }
+                    
+                    const novoBackup = {
+                        id: Date.now(),
+                        nome: backupData.nome || `Backup Importado ${new Date().toLocaleDateString()}`,
+                        data: backupData.data || new Date().toLocaleString('pt-BR'),
+                        heroi: backupData.heroi,
+                        version: backupData.version || '1.0'
+                    };
+                    
                     backups.unshift(novoBackup);
                     
                     if (backups.length > MAX_BACKUPS) {
@@ -1616,12 +1620,25 @@ function importarBackup() {
                     salvarBackups();
                     atualizarListaBackups();
                     
-                    adicionarNotificacao(`Backup "${novoBackup.nome}" importado com sucesso!`, 'important');
+                    adicionarNotificacao(`Backup "${novoBackup.nome}" importado e adicionado à lista!`, 'important');
+                    
+                } else if (opcao === '2') {
+                    // Restaurar diretamente
+                    if (confirm('ATENÇÃO: Você está prestes a restaurar este backup. O progresso atual será perdido. Continuar?')) {
+                        Object.assign(heroi, backupData.heroi);
+                        atualizarStatus();
+                        atualizarInventario();
+                        
+                        adicionarNotificacao(`Backup "${backupData.nome || 'Importado'}" restaurado com sucesso!`, 'important');
+                    }
+                    
+                } else {
+                    adicionarNotificacao('Importação cancelada.', 'warning');
                 }
                 
             } catch (error) {
                 adicionarNotificacao('Erro ao importar backup. Verifique se o arquivo está correto.', 'warning');
-                console.error(error);
+                console.error('Erro na importação:', error);
             }
         };
         
@@ -1632,55 +1649,6 @@ function importarBackup() {
     document.body.appendChild(fileInput);
     fileInput.click();
     document.body.removeChild(fileInput);
-}
-
-// Confirmar importação de backup (para importação manual via texto)
-function confirmarImportarBackup() {
-    const input = document.getElementById('backupNameInput');
-    const backupString = input.value.trim();
-    
-    if (!backupString) {
-        adicionarNotificacao('Por favor, cole o código do backup.', 'warning');
-        return;
-    }
-    
-    try {
-        const backupData = JSON.parse(backupString);
-        
-        // Validação básica do backup
-        if (!backupData.heroi || !backupData.heroi.nome) {
-            throw new Error('Formato de backup inválido.');
-        }
-        
-        if (backups.length >= MAX_BACKUPS) {
-            adicionarNotificacao(`Limite de ${MAX_BACKUPS} backups atingido. Exclua um backup antigo primeiro.`, 'warning');
-            return;
-        }
-        
-        backupData.id = Date.now();
-        if (!backupData.data) {
-            backupData.data = new Date().toLocaleString('pt-BR');
-        }
-        if (!backupData.nome) {
-            backupData.nome = 'Backup Importado';
-        }
-        
-        backups.unshift(backupData);
-        
-        if (backups.length > MAX_BACKUPS) {
-            backups = backups.slice(0, MAX_BACKUPS);
-        }
-        
-        salvarBackups();
-        atualizarListaBackups();
-        fecharModalBackup();
-        
-        adicionarNotificacao(`Backup "${backupData.nome}" importado com sucesso!`, 'important');
-        
-    } catch (error) {
-        adicionarNotificacao('Erro ao importar backup. Verifique se o código está correto.', 'warning');
-        console.error(error);
-    }
 }
 
 // Atualizar lista de backups na UI
