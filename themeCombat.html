@@ -1130,7 +1130,7 @@ body {
     <div>
         <span id="eq-weapon">Nenhuma</span>
         <button id="btn-desequipar-weapon" class="desequip-btn" style="display: none;" onclick="desequiparItem('weapon')">X</button>
-    </div>
+</div>
 </div>
 <div class="equip-slot">
     <span class="muted">Off-hand</span>
@@ -2624,7 +2624,7 @@ function mostrarTodosItens() {
             const card = document.createElement('div');
             const isBossItem = item.id && item.id.includes('boss_item');
             const isLendario = item.preco > 5000000;
-            const isConsumivel = item.tipo === 'consum';
+            const isConsumivel = item.tipo === 'consum' && item.heal;
             
             let cardClass = 'item-card';
             if (isBossItem) cardClass += ' boss-item';
@@ -3393,11 +3393,13 @@ atualizarStatus();
 }
 
 // ========================
-// Sistema de luta com escalonamento de nível
+// Sistema de luta com escalonamento de nível - SISTEMA ORIGINAL RESTAURADO
 // ========================
 
 function encontrarInimigo() {
+    // Sistema original: 5% base + 0.01% por nível (até nível 1000)
     const chanceBoss = 0.05 + (Math.min(heroi.lv, 1000) * 0.0001);
+    
     if (Math.random() < chanceBoss) {
         const boss = BOSSES[Math.floor(Math.random() * BOSSES.length)];
         inimigoAtual = { ...boss };
@@ -3408,7 +3410,10 @@ function encontrarInimigo() {
         inimigoAtual.def = Math.floor(inimigoAtual.def * multiplicadorNivel);
         
         inimigoAtual.hpMax = inimigoAtual.hp;
-        adicionarNotificacao(`🚨 UM CHEFE APARECEU: ${boss.nome}! 🚨`, 'important');
+        
+        // Mostra a chance real no log
+        const chancePercent = (chanceBoss * 100).toFixed(2);
+        adicionarNotificacao(`🚨 UM CHEFE APARECEU: ${boss.nome}! (Chance: ${chancePercent}%)`, 'important');
     } else {
         const inim = ENEMIES[Math.floor(Math.random() * ENEMIES.length)];
         inimigoAtual = { ...inim };
